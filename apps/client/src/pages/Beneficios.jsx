@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, Heart, Share2, Clock, SlidersHorizontal, Search } from 'lucide-react'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 
 const CAT_GRADIENT = {
   gastro:    'linear-gradient(135deg, #c8102e 0%, #8e0a1f 100%)',
@@ -10,45 +12,40 @@ const CAT_GRADIENT = {
   servicios: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
 }
 
-const BENEFITS = [
-  {
-    id: 1, cat: 'gastro', catLabel: 'GASTRONOMÍA', badge: '-30%',
-    title: '30% OFF en cafetería', store: 'Café Martínez', location: 'Local 12',
-    expires: '30 abr', usage: '1×día', validDays: 'Lun-Vie',
-    description: 'Descuento en cafetería, pastelería y tostados. Válido de lunes a viernes hasta las 18hs. No acumulable con otras promociones.',
-    terms: ['Exclusivo para socios del Club con credencial vigente.', 'No acumulable con otras promociones.', 'Presentar QR o credencial en caja antes de pagar.', 'Beneficio sujeto a disponibilidad del local.'],
-  },
-  {
-    id: 2, cat: 'cine', catLabel: 'ENTRETENIMIENTO', badge: '2x1',
-    title: '2x1 entradas de cine', store: 'Showcase', location: '3er piso',
-    expires: '28 abr', usage: '1×sem', validDays: 'Mié',
-    description: 'Comprá una entrada y llevate la segunda gratis. Válido para todas las salas excepto 3D premium.',
-    terms: ['Válido solo los días miércoles.', 'No aplica a estrenos en salas premium.', 'Canjeable una vez por semana por usuario.', 'Sujeto a disponibilidad de funciones.'],
-  },
-  {
-    id: 3, cat: 'moda', catLabel: 'MODA', badge: '-20%',
-    title: '20% OFF en zapatillas', store: 'Grimoldi', location: 'Local 08',
-    expires: '15 may', usage: '1 vez', validDays: 'Todos',
-    description: 'Descuento en toda la línea de zapatillas y calzado deportivo de la nueva temporada.',
-    terms: ['Válido en calzado de la nueva colección.', 'No aplica sobre precios de liquidación.', 'Un solo uso por usuario.', 'Sujeto a stock disponible.'],
-  },
-  {
-    id: 4, cat: 'servicios', catLabel: 'SERVICIOS', badge: '2 HS',
-    title: 'Estacionamiento 2hs gratis', store: 'Playa Ribera', location: 'PB',
-    expires: 'hoy', usage: '1×día', validDays: 'Todos',
-    description: 'Obtené 2 horas de estacionamiento gratuito presentando tu credencial en la cabina de acceso.',
-    terms: ['Válido presentando credencial digital o física.', 'Máximo 2 horas por día por vehículo.', 'No acumulable con otros descuentos.', 'Sujeto a disponibilidad de espacios.'],
-  },
-  {
-    id: 5, cat: 'salud', catLabel: 'SALUD', badge: '-15%',
-    title: '15% OFF productos', store: 'Farmacity', location: 'Local 22',
-    expires: '05 may', usage: '1×día', validDays: 'Todos',
-    description: 'Descuento del 15% en medicamentos de venta libre, cosmética y cuidado personal.',
-    terms: ['No aplica sobre medicamentos bajo receta.', 'Acumulable con descuentos bancarios.', 'Válido en todos los productos excepto exclusiones.', 'Límite de compra $50.000.'],
-  },
-]
+const CAT_LABELS = {
+  gastro: 'GASTRONOMÍA', moda: 'MODA', cine: 'ENTRETENIMIENTO',
+  salud: 'SALUD', hogar: 'HOGAR', servicios: 'SERVICIOS',
+}
 
 const CHIPS = ['Todos', 'Gastro', 'Moda', 'Entretenim.', 'Salud', 'Hogar', 'Servicios']
+
+const CHIP_TO_CAT = {
+  'Gastro': 'gastro', 'Moda': 'moda', 'Entretenim.': 'cine',
+  'Salud': 'salud', 'Hogar': 'hogar', 'Servicios': 'servicios',
+}
+
+function formatExpiry(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
+  return `${d.getDate()} ${months[d.getMonth()]}`
+}
+
+function mapBenefit(b) {
+  return {
+    id: b.id,
+    cat: b.category,
+    catLabel: CAT_LABELS[b.category] || b.category.toUpperCase(),
+    badge: b.badge,
+    title: b.title,
+    store: b.store,
+    location: '',
+    expires: formatExpiry(b.expires_at),
+    validDays: b.days_available,
+    description: b.description,
+    terms: [],
+  }
+}
 
 function QRGrid() {
   const grid = Array.from({ length: 25 }).map((_, y) =>
@@ -78,8 +75,12 @@ function QRGrid() {
 }
 
 // ── LISTA ──
-function BenList({ onSelect }) {
+function BenList({ onSelect, benefits, loading }) {
   const [activeChip, setActiveChip] = useState('Todos')
+
+  const filtered = activeChip === 'Todos'
+    ? benefits
+    : benefits.filter(b => b.cat === CHIP_TO_CAT[activeChip])
 
   return (
     <div>
@@ -123,7 +124,12 @@ function BenList({ onSelect }) {
       </div>
 
       <div style={{ padding: '0 20px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {BENEFITS.map((b) => (
+        {loading && (
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--muted)', fontSize: 13 }}>
+            Cargando beneficios…
+          </div>
+        )}
+        {!loading && filtered.map((b) => (
           <div
             key={b.id}
             onClick={() => onSelect(b)}
@@ -277,8 +283,24 @@ function BenRedeem({ benefit, onBack }) {
 
 // ── MAIN ──
 export default function Beneficios() {
+  const { user } = useAuth()
   const [view, setView] = useState('list')
   const [selected, setSelected] = useState(null)
+  const [benefits, setBenefits] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!user?.shopping_id) return
+    supabase
+      .from('benefits')
+      .select('*')
+      .eq('shopping_id', user.shopping_id)
+      .eq('active', true)
+      .then(({ data }) => {
+        setBenefits((data || []).map(mapBenefit))
+        setLoading(false)
+      })
+  }, [user?.shopping_id])
 
   if (view === 'detail' && selected) {
     return <BenDetail benefit={selected} onBack={() => setView('list')} onRedeem={() => setView('redeem')} />
@@ -286,5 +308,5 @@ export default function Beneficios() {
   if (view === 'redeem' && selected) {
     return <BenRedeem benefit={selected} onBack={() => setView('detail')} />
   }
-  return <BenList onSelect={(b) => { setSelected(b); setView('detail') }} />
+  return <BenList benefits={benefits} loading={loading} onSelect={(b) => { setSelected(b); setView('detail') }} />
 }
