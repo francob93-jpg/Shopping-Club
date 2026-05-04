@@ -1,51 +1,50 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { supabase } from '../lib/supabase'
 
-const TODAY = new Date().toDateString()
 const DAILY_SPIN_LIMIT = 10
 
-const PRIZES = [
-  { id: 0, label: '10% OFF',    color: '#c8102e', textDark: false, prob: 15, isReal: true  },
-  { id: 1, label: '2x1',        color: '#b8863a', textDark: false, prob: 8,  isReal: true  },
-  { id: 2, label: '20% OFF',    color: '#8e0a1f', textDark: false, prob: 10, isReal: true  },
-  { id: 3, label: '☕',          color: '#fbe6ea', textDark: true,  prob: 7,  isReal: true  },
-  { id: 4, label: '50% OFF',    color: '#4c0513', textDark: false, prob: 5,  isReal: true  },
-  { id: 5, label: 'Otra\ngira', color: '#f3e6cc', textDark: true,  prob: 40, isReal: false },
-  { id: 6, label: '🎬',          color: '#e15566', textDark: false, prob: 8,  isReal: true  },
-  { id: 7, label: '5% OFF',     color: '#b8863a', textDark: false, prob: 7,  isReal: true  },
+// Propiedades visuales por posición (no se guardan en BD)
+const SEGMENT_STYLES = [
+  { color: '#c8102e', textDark: false, prob: 15, isReal: true  },
+  { color: '#b8863a', textDark: false, prob: 8,  isReal: true  },
+  { color: '#8e0a1f', textDark: false, prob: 10, isReal: true  },
+  { color: '#fbe6ea', textDark: true,  prob: 7,  isReal: true  },
+  { color: '#4c0513', textDark: false, prob: 5,  isReal: true  },
+  { color: '#f3e6cc', textDark: true,  prob: 40, isReal: false },
+  { color: '#e15566', textDark: false, prob: 8,  isReal: true  },
+  { color: '#b8863a', textDark: false, prob: 7,  isReal: true  },
 ]
 
-function pickWinner() {
-  const total = PRIZES.reduce((s, p) => s + p.prob, 0)
-  let rand = Math.random() * total
-  for (const p of PRIZES) { rand -= p.prob; if (rand <= 0) return p }
-  return PRIZES[PRIZES.length - 1]
+function mergePrizes(dbPrizes) {
+  return dbPrizes.map(p => ({
+    id: p.segment_index,
+    label: p.label,
+    ...(SEGMENT_STYLES[p.segment_index] || { color: '#c8102e', textDark: false, prob: 5, isReal: true }),
+  }))
 }
 
-function spinKey(c)  { return `spin_date_${c}` }
-function countKey(c) { return `spin_count_${c}` }
-function prizeKey(c) { return `spin_prize_${c}` }
-function codeKey(c)  { return `spin_code_${c}` }
-function getSpinCount(c) {
-  return localStorage.getItem(spinKey(c)) === TODAY
-    ? Number(localStorage.getItem(countKey(c)) || 0)
-    : 0
+function pickWinner(prizes) {
+  const total = prizes.reduce((s, p) => s + p.prob, 0)
+  let rand = Math.random() * total
+  for (const p of prizes) { rand -= p.prob; if (rand <= 0) return p }
+  return prizes[prizes.length - 1]
 }
-function spinsLeft(c) { return Math.max(0, DAILY_SPIN_LIMIT - getSpinCount(c)) }
-function reachedSpinLimit(c) { return spinsLeft(c) === 0 }
-function getSavedPrize(c) { return localStorage.getItem(prizeKey(c)) }
-function getSavedCode(c)  { return localStorage.getItem(codeKey(c)) }
+
 function generateCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  const seg = (n) => Array.from({length: n}, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  const seg = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
   return `RB-${seg(4)}-${seg(4)}`
 }
 
+const isDemo = (id) => typeof id === 'string' && id.startsWith('demo-')
+
 // ── SVG WHEEL ──
-function WheelSVG({ size = 280, rotation = 0, spinning = false }) {
-  const N = PRIZES.length
+function WheelSVG({ prizes, size = 280, rotation = 0, spinning = false }) {
+  const N = prizes.length
   const r = size / 2
+  if (N === 0) return null
   return (
     <svg
       width={size} height={size} viewBox={`0 0 ${size} ${size}`}
@@ -61,7 +60,7 @@ function WheelSVG({ size = 280, rotation = 0, spinning = false }) {
         </filter>
       </defs>
       <g filter="url(#ws)">
-        {PRIZES.map((p, i) => {
+        {prizes.map((p, i) => {
           const a0 = (i / N) * Math.PI * 2 - Math.PI / 2
           const a1 = ((i + 1) / N) * Math.PI * 2 - Math.PI / 2
           const x0 = r + r * Math.cos(a0), y0 = r + r * Math.sin(a0)
@@ -122,19 +121,82 @@ function Header() {
 export default function Ruleta() {
   const { user }   = useAuth()
   const navigate   = useNavigate()
-  const credential = user?.credential_number
 
-  const savedPrizeLabel = getSavedPrize(credential)
-  const savedPrize = PRIZES.find(p => p.label === savedPrizeLabel) || null
-
-  const [spinCount, setSpinCount] = useState(() => getSpinCount(credential))
-  const [phase, setPhase]         = useState(() => reachedSpinLimit(credential) ? 'used' : 'ready')
+  const [prizes, setPrizes]       = useState([])
+  const [spinCount, setSpinCount] = useState(0)
+  const [wonPrize, setWonPrize]   = useState(null)
+  const [prizeCode, setPrizeCode] = useState(null)
+  const [phase, setPhase]         = useState('loading')
   const [spinning, setSpinning]   = useState(false)
-  const [wonPrize, setWonPrize]   = useState(savedPrize)
-  const [prizeCode, setPrizeCode] = useState(() => getSavedCode(credential))
   const [rotation, setRotation]   = useState(0)
   const rotRef = useRef(0)
+
   const remainingSpins = Math.max(0, DAILY_SPIN_LIMIT - spinCount)
+
+  // Carga inicial: premios + giros de hoy
+  useEffect(() => {
+    if (!user?.shopping_id) return
+
+    const loadData = async () => {
+      // Premios de la ruleta
+      const { data: dbPrizes } = await supabase
+        .from('prizes')
+        .select('*')
+        .eq('shopping_id', user.shopping_id)
+        .eq('active', true)
+        .order('segment_index')
+
+      if (dbPrizes?.length) setPrizes(mergePrizes(dbPrizes))
+
+      if (isDemo(user.id)) {
+        // Usuario demo: usa localStorage
+        const TODAY = new Date().toDateString()
+        const count = localStorage.getItem(`spin_date_${user.credential_number}`) === TODAY
+          ? Number(localStorage.getItem(`spin_count_${user.credential_number}`) || 0)
+          : 0
+        const savedLabel = localStorage.getItem(`spin_prize_${user.credential_number}`)
+        const savedCode  = localStorage.getItem(`spin_code_${user.credential_number}`)
+        setSpinCount(count)
+        if (savedLabel && dbPrizes) {
+          const merged = mergePrizes(dbPrizes)
+          setWonPrize(merged.find(p => p.label === savedLabel) || null)
+          setPrizeCode(savedCode)
+        }
+        setPhase(count >= DAILY_SPIN_LIMIT ? 'used' : 'ready')
+        return
+      }
+
+      // Usuario real: consulta tabla spins
+      const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
+      const { count } = await supabase
+        .from('spins')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('spun_at', todayStart.toISOString())
+
+      const { data: lastSpin } = await supabase
+        .from('spins')
+        .select('prize_label, prize_code')
+        .eq('user_id', user.id)
+        .gte('spun_at', todayStart.toISOString())
+        .order('spun_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      const todayCount = count || 0
+      setSpinCount(todayCount)
+
+      if (lastSpin && dbPrizes) {
+        const merged = mergePrizes(dbPrizes)
+        setWonPrize(merged.find(p => p.label === lastSpin.prize_label) || null)
+        setPrizeCode(lastSpin.prize_code)
+      }
+
+      setPhase(todayCount >= DAILY_SPIN_LIMIT ? 'used' : 'ready')
+    }
+
+    loadData()
+  }, [user?.shopping_id, user?.id])
 
   // Countdown
   const [cd, setCd] = useState({ h: '00', m: '00', s: '00' })
@@ -155,32 +217,52 @@ export default function Ruleta() {
     return () => clearInterval(id)
   }, [phase])
 
-  const handleSpin = () => {
-    if (phase !== 'ready' || spinning) return
+  const handleSpin = async () => {
+    if (phase !== 'ready' || spinning || prizes.length === 0) return
     setSpinning(true)
 
-    const winner   = pickWinner()
-    const segAngle = ((winner.id + 0.5) / PRIZES.length) * 360
+    const winner   = pickWinner(prizes)
+    const segAngle = ((winner.id + 0.5) / prizes.length) * 360
     const curAngle = rotRef.current % 360
     const extra    = (segAngle - curAngle + 360) % 360
     const newRot   = rotRef.current + extra + 5 * 360
     rotRef.current = newRot
     setRotation(newRot)
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const code = generateCode()
-      const nextSpinCount = getSpinCount(credential) + 1
-      localStorage.setItem(spinKey(credential), TODAY)
-      localStorage.setItem(countKey(credential), String(nextSpinCount))
-      localStorage.setItem(prizeKey(credential), winner.label)
-      localStorage.setItem(codeKey(credential), code)
-      setSpinCount(nextSpinCount)
+
+      if (isDemo(user.id)) {
+        const TODAY = new Date().toDateString()
+        const nextCount = spinCount + 1
+        localStorage.setItem(`spin_date_${user.credential_number}`, TODAY)
+        localStorage.setItem(`spin_count_${user.credential_number}`, String(nextCount))
+        localStorage.setItem(`spin_prize_${user.credential_number}`, winner.label)
+        localStorage.setItem(`spin_code_${user.credential_number}`, code)
+        setSpinCount(nextCount)
+      } else {
+        await supabase.from('spins').insert({
+          user_id: user.id,
+          shopping_id: user.shopping_id,
+          prize_label: winner.label,
+          prize_code: code,
+        })
+        setSpinCount(prev => prev + 1)
+      }
+
       setWonPrize(winner)
       setPrizeCode(code)
       setSpinning(false)
       setPhase('won')
     }, 3700)
   }
+
+  if (phase === 'loading') return (
+    <div>
+      <Header />
+      <div style={{ textAlign: 'center', padding: 60, color: 'var(--muted)', fontSize: 13 }}>Cargando ruleta…</div>
+    </div>
+  )
 
   // ── YA USADA ──
   if (phase === 'used') return (
@@ -189,10 +271,9 @@ export default function Ruleta() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px', gap: 14 }}>
 
         <div style={{ opacity: 0.45, filter: 'saturate(0.5)' }}>
-          <WheelSVG size={220} rotation={rotRef.current} spinning={false} />
+          <WheelSVG prizes={prizes} size={220} rotation={rotRef.current} spinning={false} />
         </div>
 
-        {/* Countdown */}
         <div style={{ background: '#fff', borderRadius: 18, padding: 16, width: '100%', textAlign: 'center', boxShadow: 'var(--shadow)', border: '1px solid var(--primary-soft)' }}>
           <div style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Ya usaste tus {DAILY_SPIN_LIMIT} giros de hoy</div>
           <div style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, marginTop: 6 }}>Nuevos giros en</div>
@@ -209,7 +290,6 @@ export default function Ruleta() {
           </div>
         </div>
 
-        {/* Último premio */}
         {wonPrize && (
           <div style={{ background: '#fff', borderRadius: 18, padding: 14, width: '100%', display: 'flex', gap: 12, alignItems: 'center', boxShadow: 'var(--shadow)' }}>
             <div style={{
@@ -229,9 +309,8 @@ export default function Ruleta() {
           </div>
         )}
 
-        {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, width: '100%' }}>
-          {[{ val: '12', lbl: 'Giros mes' }, { val: '7', lbl: 'Premios' }, { val: '$8.4k', lbl: 'Ahorrado' }].map(s => (
+          {[{ val: spinCount, lbl: 'Giros hoy' }, { val: DAILY_SPIN_LIMIT, lbl: 'Límite diario' }, { val: DAILY_SPIN_LIMIT - spinCount, lbl: 'Usados' }].map(s => (
             <div key={s.lbl} style={{ background: '#fff', borderRadius: 14, padding: '10px 8px', textAlign: 'center', boxShadow: 'var(--shadow)' }}>
               <div style={{ fontFamily: 'Fraunces, serif', fontWeight: 600, fontSize: 18, color: 'var(--ink)' }}>{s.val}</div>
               <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 3 }}>{s.lbl}</div>
@@ -248,7 +327,6 @@ export default function Ruleta() {
       <Header />
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px', gap: 16 }}>
 
-        {/* Badge */}
         {phase !== 'won' && (
           <div style={{ background: 'var(--primary-soft)', color: 'var(--primary-2)', padding: '6px 14px', borderRadius: 999, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--primary)' }}/>
@@ -256,18 +334,16 @@ export default function Ruleta() {
           </div>
         )}
 
-        {/* Wheel */}
         <div style={{ position: 'relative' }}>
           <svg width="28" height="36" viewBox="0 0 28 36"
             style={{ position: 'absolute', top: -10, left: 'calc(50% - 14px)', zIndex: 3, filter: 'drop-shadow(0 3px 4px rgba(0,0,0,0.2))' }}>
             <path d="M14 34L2 4h24L14 34z" fill="#b8863a" stroke="#1a1423" strokeWidth="1.5"/>
           </svg>
           <div style={{ opacity: phase === 'won' ? 0.4 : 1, filter: phase === 'won' ? 'blur(2px)' : 'none', transition: 'all 0.4s' }}>
-            <WheelSVG size={290} rotation={rotation} spinning={spinning} />
+            <WheelSVG prizes={prizes} size={290} rotation={rotation} spinning={spinning} />
           </div>
         </div>
 
-        {/* Botón girar */}
         {phase !== 'won' && (
           <>
             <button
@@ -294,7 +370,6 @@ export default function Ruleta() {
           </>
         )}
 
-        {/* Modal GANASTE */}
         {phase === 'won' && wonPrize && (
           <div style={{ background: '#fff', borderRadius: 24, padding: 24, width: '100%', textAlign: 'center', boxShadow: 'var(--shadow-lg)', position: 'relative', overflow: 'hidden' }}>
             {wonPrize.isReal && <Confetti />}
@@ -309,8 +384,8 @@ export default function Ruleta() {
             </div>
             {wonPrize.isReal ? (
               <>
-                <div style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 10 }}>en tu próxima compra en</div>
-                <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2, color: 'var(--ink)' }}>Grimoldi · Local 08</div>
+                <div style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 10 }}>en tu próxima compra</div>
+                <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2, color: 'var(--ink)' }}>Presentá tu credencial en el local</div>
               </>
             ) : (
               <div style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 10 }}>No se generó un cupón esta vez</div>
