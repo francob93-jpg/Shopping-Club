@@ -99,12 +99,16 @@ export function AuthProvider({ children }) {
       return { success: true, user: demoUser }
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) return { success: false, error: 'Credenciales incorrectas' }
-    const u = await buildUser(data.user)
-    if (!u) return { success: false, error: 'Perfil no encontrado' }
-    setUser(u)
-    return { success: true, user: u }
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) return { success: false, error: 'Credenciales incorrectas' }
+      const u = await buildUser(data.user)
+      if (!u) return { success: false, error: 'Perfil no encontrado' }
+      setUser(u)
+      return { success: true, user: u }
+    } catch (e) {
+      return { success: false, error: 'Error de conexión, intentá de nuevo' }
+    }
   }
 
   const logout = async () => {
