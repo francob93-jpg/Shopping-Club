@@ -100,13 +100,20 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), 10000)
+      )
+      const { data, error } = await Promise.race([
+        supabase.auth.signInWithPassword({ email, password }),
+        timeout,
+      ])
       if (error) return { success: false, error: 'Credenciales incorrectas' }
       const u = await buildUser(data.user)
       if (!u) return { success: false, error: 'Perfil no encontrado' }
       setUser(u)
       return { success: true, user: u }
     } catch (e) {
+      if (e.message === 'timeout') return { success: false, error: 'Tiempo agotado, verificá tu conexión' }
       return { success: false, error: 'Error de conexión, intentá de nuevo' }
     }
   }
