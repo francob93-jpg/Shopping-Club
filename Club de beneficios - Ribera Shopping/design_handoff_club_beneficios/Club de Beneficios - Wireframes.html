@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Club de Beneficios · Wireframes</title>
+<link rel="stylesheet" href="styles.css"/>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<script type="text/babel" src="sketchy.jsx"></script>
+<script type="text/babel" src="screens-home.jsx"></script>
+<script type="text/babel" src="screens-benefits.jsx"></script>
+<script type="text/babel" src="screens-wheel.jsx"></script>
+<script type="text/babel" src="screens-other.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect } = React;
+
+const TWEAKS_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "plum",
+  "density": "cozy",
+  "annotations": true
+}/*EDITMODE-END*/;
+
+const ACCENTS = {
+  "deep-purple": "oklch(0.42 0.15 290)",
+  "navy":        "oklch(0.32 0.12 260)",
+  "plum":        "oklch(0.40 0.14 340)",
+  "forest":      "oklch(0.42 0.12 155)"
+};
+
+function TweaksPanel({ tweaks, setTweaks, visible, setVisible }) {
+  if (!visible) return null;
+  const setKey = (k,v) => {
+    const next = { ...tweaks, [k]: v };
+    setTweaks(next);
+    try { window.parent.postMessage({type:'__edit_mode_set_keys', edits:{[k]:v}}, '*'); } catch(e) {}
+  };
+  return (
+    <div style={{
+      position:'fixed', bottom:16, right:16, zIndex:50,
+      background:'var(--paper)', border:'1.5px solid var(--rule)', borderRadius:12,
+      padding:12, width:240, boxShadow:'3px 4px 0 rgba(0,0,0,0.1)',
+      fontFamily:'Kalam, sans-serif'
+    }}>
+      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8}}>
+        <div className="title-hand" style={{fontSize:20}}>Tweaks</div>
+        <div style={{cursor:'pointer', fontSize:16}} onClick={()=>setVisible(false)}>✕</div>
+      </div>
+
+      <div style={{fontSize:11, color:'var(--ink-faint)', marginBottom:4}}>Color de acento</div>
+      <div style={{display:'flex', gap:6, marginBottom:10}}>
+        {Object.entries(ACCENTS).map(([k,v])=>(
+          <div key={k}
+            onClick={()=>setKey('accent', k)}
+            title={k}
+            style={{
+              width:26, height:26, borderRadius:'50%',
+              background:v, cursor:'pointer',
+              border: tweaks.accent===k ? '2px solid var(--ink)' : '1.5px solid rgba(0,0,0,0.2)'
+            }}
+          />
+        ))}
+      </div>
+
+      <div style={{fontSize:11, color:'var(--ink-faint)', marginBottom:4}}>Densidad</div>
+      <div style={{display:'flex', gap:4, marginBottom:10}}>
+        {['compact','cozy','roomy'].map(d=>(
+          <div key={d}
+            onClick={()=>setKey('density', d)}
+            className={`sk-chip ${tweaks.density===d ? 'active':''}`}
+            style={{cursor:'pointer', flex:1, justifyContent:'center'}}>
+            {d}
+          </div>
+        ))}
+      </div>
+
+      <div style={{display:'flex', alignItems:'center', gap:6}}>
+        <input
+          id="ann"
+          type="checkbox"
+          checked={!!tweaks.annotations}
+          onChange={e=>setKey('annotations', e.target.checked)}
+        />
+        <label htmlFor="ann" style={{fontSize:12}}>Mostrar anotaciones</label>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [tweaks, setTweaks] = useState(TWEAKS_DEFAULTS);
+  const [editMode, setEditMode] = useState(false);
+
+  useEffect(()=>{
+    const onMsg = (e) => {
+      if (!e.data || !e.data.type) return;
+      if (e.data.type === '__activate_edit_mode')   setEditMode(true);
+      if (e.data.type === '__deactivate_edit_mode') setEditMode(false);
+    };
+    window.addEventListener('message', onMsg);
+    try { window.parent.postMessage({type:'__edit_mode_available'}, '*'); } catch(e) {}
+    return () => window.removeEventListener('message', onMsg);
+  },[]);
+
+  // apply tweaks via CSS vars + data attrs
+  useEffect(()=>{
+    document.documentElement.style.setProperty('--accent', ACCENTS[tweaks.accent] || ACCENTS['deep-purple']);
+    document.documentElement.setAttribute('data-density', tweaks.density || 'cozy');
+  },[tweaks]);
+
+  const annotate = !!tweaks.annotations;
+
+  const AW = 391; // phone outer width ~ 375 + padding + border
+  const AH = 780;
+
+  return (
+    <>
+      <RoughFilter/>
+
+      <DesignCanvas title="Club de Beneficios — Wireframes" subtitle="Paseo de la Ribera · Rio Cuarto · low-fi">
+        <DCSection id="intro" title="Introducción" subtitle="sistema de diseño y premisas">
+          <DCArtboard id="intro-note" label="Leéme primero" width={520} height={600}>
+            <div style={{padding:28, fontFamily:'Architects Daughter, sans-serif', height:'100%', boxSizing:'border-box'}}>
+              <div className="title-hand" style={{fontSize:40, lineHeight:1, color:'var(--accent)'}}>Club de Beneficios</div>
+              <div className="kalam" style={{fontSize:14, color:'var(--ink-faint)', marginTop:4}}>Paseo de la Ribera · wireframes low-fi</div>
+
+              <div style={{marginTop:18, fontSize:14, lineHeight:1.6}}>
+                <p>Estos wireframes son para <span className="sk-underline">explorar estructura y flujo</span>, no el look final. La tipografía, colores y imágenes son placeholders intencionales.</p>
+                <p style={{marginTop:10}}><b>Premisas que apliqué:</b></p>
+                <ul style={{paddingLeft:18, margin:'6px 0'}}>
+                  <li>5 tabs en bottom nav · siempre visibles</li>
+                  <li>Credencial digital SL-2024-XXXXX como elemento clave</li>
+                  <li>Ruleta: 1 giro/día, premios variados</li>
+                  <li>Canje vía QR validado por el local</li>
+                  <li>Nunca decir "cupones" — siempre "beneficios"</li>
+                  <li>Deep purple como acento</li>
+                </ul>
+
+                <p style={{marginTop:10}}><b>Qué explorar con Tweaks (botón abajo a la derecha):</b></p>
+                <ul style={{paddingLeft:18, margin:'6px 0'}}>
+                  <li>Color de acento · 4 opciones</li>
+                  <li>Densidad · compact / cozy / roomy</li>
+                  <li>Anotaciones · on/off</li>
+                </ul>
+
+                <div className="sk-box highlight" style={{padding:10, marginTop:14}}>
+                  <div className="kalam" style={{fontSize:12}}>
+                    👉 Mirá varias variantes por pantalla. Decime cuáles te gustan y las llevamos a hi-fi con el branding real.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="home" title="1 · Home" subtitle="tres abordajes distintos">
+          <DCArtboard id="home-a" label="A — clásico" width={AW} height={AH}>
+            <HomeA/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:100}}>
+              Promo destacada grande y al frente — “lo de hoy”
+            </Annotation>}
+          </DCArtboard>
+          <DCArtboard id="home-b" label="B — credencial al frente" width={AW} height={AH}>
+            <HomeB/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:70}}>
+              La credencial es el primer elemento. Útil si el usuario la muestra seguido
+            </Annotation>}
+          </DCArtboard>
+          <DCArtboard id="home-c" label="C — feed + mapa" width={AW} height={AH}>
+            <HomeC/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:180}}>
+              Mapa del shopping integrado — útil para locales físicos
+            </Annotation>}
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="benefits" title="2 · Beneficios" subtitle="lista, detalle y canje">
+          <DCArtboard id="ben-list" label="Lista" width={AW} height={AH}>
+            <BenefitsList/>
+          </DCArtboard>
+          <DCArtboard id="ben-detail" label="Detalle" width={AW} height={AH}>
+            <BenefitDetail/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:250}}>
+              CTA "Canjear beneficio" sticky abajo
+            </Annotation>}
+          </DCArtboard>
+          <DCArtboard id="ben-redeem" label="Canje QR" width={AW} height={AH}>
+            <BenefitRedeem/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:140}}>
+              QR + código corto de respaldo + timer de validez
+            </Annotation>}
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="wheel" title="3 · Ruleta diaria" subtitle="tres estados del mismo flujo">
+          <DCArtboard id="wheel-a" label="A — girá!" width={AW} height={AH}>
+            <WheelA/>
+          </DCArtboard>
+          <DCArtboard id="wheel-b" label="B — ganaste" width={AW} height={AH}>
+            <WheelB/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:200}}>
+              Modal sobre la ruleta difuminada. Código queda guardado en Beneficios
+            </Annotation>}
+          </DCArtboard>
+          <DCArtboard id="wheel-c" label="C — ya usaste" width={AW} height={AH}>
+            <WheelC/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:220}}>
+              Countdown al próximo giro + último premio ganado
+            </Annotation>}
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="news" title="4 · Novedades" subtitle="dos abordajes">
+          <DCArtboard id="news-a" label="A — feed estilo Instagram" width={AW} height={AH}>
+            <NewsA/>
+          </DCArtboard>
+          <DCArtboard id="news-b" label="B — lista compacta + filtros" width={AW} height={AH}>
+            <NewsB/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="profile" title="5 · Perfil / Credencial" subtitle="la credencial como protagonista">
+          <DCArtboard id="prof-a" label="A — clásico" width={AW} height={AH}>
+            <ProfileA/>
+          </DCArtboard>
+          <DCArtboard id="prof-b" label="B — credencial Wallet" width={AW} height={AH}>
+            <ProfileB/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:120}}>
+              Estilo "tarjeta digital" — protagonista
+            </Annotation>}
+          </DCArtboard>
+          <DCArtboard id="prof-c" label="C — credencial con QR" width={AW} height={AH}>
+            <ProfileC/>
+            {annotate && <Annotation style={{position:'absolute', right:-170, top:200}}>
+              QR escaneable en el acceso / locales
+            </Annotation>}
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+
+      <TweaksPanel tweaks={tweaks} setTweaks={setTweaks} visible={editMode} setVisible={setEditMode}/>
+      {!editMode && (
+        <div
+          onClick={()=>setEditMode(true)}
+          style={{
+            position:'fixed', bottom:16, right:16, zIndex:40,
+            background:'var(--paper)', border:'1.5px solid var(--rule)',
+            borderRadius:999, padding:'6px 12px', cursor:'pointer',
+            fontFamily:'Kalam, sans-serif', fontSize:12,
+            boxShadow:'2px 3px 0 rgba(0,0,0,0.1)'
+          }}>
+          ⚙ Tweaks
+        </div>
+      )}
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+</body>
+</html>

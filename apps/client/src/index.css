@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary:      #c8102e;
+  --primary-2:    #8e0a1f;
+  --primary-dark: #4c0513;
+  --primary-soft: #fbe6ea;
+  --gold:         #b8863a;
+  --gold-soft:    #f3e6cc;
+  --ink:          #1a1423;
+  --ink-2:        #3d3449;
+  --muted:        #8a8194;
+  --line:         #e9e3dc;
+  --surface:      #ffffff;
+  --bg:           #f7f4ef;
+  --shadow:       0 4px 12px rgba(26, 20, 35, 0.08);
+  --shadow-lg:    0 10px 30px rgba(26, 20, 35, 0.12);
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root { min-height: 100vh; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; }
+
+/* Legacy dark-theme pages (Ruleta, Perfil) — quedan temporalmente hasta rediseño */
+.credential-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  border: 1px solid rgba(200, 16, 46, 0.3);
+  position: relative;
+  overflow: hidden;
+}
