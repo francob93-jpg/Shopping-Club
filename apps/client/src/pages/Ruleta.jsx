@@ -138,61 +138,64 @@ export default function Ruleta() {
     if (!user?.shopping_id) return
 
     const loadData = async () => {
-      // Premios de la ruleta
-      const { data: dbPrizes } = await supabase
-        .from('prizes')
-        .select('*')
-        .eq('shopping_id', user.shopping_id)
-        .eq('active', true)
-        .order('segment_index')
+      try {
+        // Premios de la ruleta
+        const { data: dbPrizes } = await supabase
+          .from('prizes')
+          .select('*')
+          .eq('shopping_id', user.shopping_id)
+          .eq('active', true)
+          .order('segment_index')
 
-      if (dbPrizes?.length) setPrizes(mergePrizes(dbPrizes))
+        if (dbPrizes?.length) setPrizes(mergePrizes(dbPrizes))
 
-      if (isDemo(user.id)) {
-        // Usuario demo: usa localStorage
-        const TODAY = new Date().toDateString()
-        const count = localStorage.getItem(`spin_date_${user.credential_number}`) === TODAY
-          ? Number(localStorage.getItem(`spin_count_${user.credential_number}`) || 0)
-          : 0
-        const savedLabel = localStorage.getItem(`spin_prize_${user.credential_number}`)
-        const savedCode  = localStorage.getItem(`spin_code_${user.credential_number}`)
-        setSpinCount(count)
-        if (savedLabel && dbPrizes) {
-          const merged = mergePrizes(dbPrizes)
-          setWonPrize(merged.find(p => p.label === savedLabel) || null)
-          setPrizeCode(savedCode)
+        if (isDemo(user.id)) {
+          const TODAY = new Date().toDateString()
+          const count = localStorage.getItem(`spin_date_${user.credential_number}`) === TODAY
+            ? Number(localStorage.getItem(`spin_count_${user.credential_number}`) || 0)
+            : 0
+          const savedLabel = localStorage.getItem(`spin_prize_${user.credential_number}`)
+          const savedCode  = localStorage.getItem(`spin_code_${user.credential_number}`)
+          setSpinCount(count)
+          if (savedLabel && dbPrizes?.length) {
+            const merged = mergePrizes(dbPrizes)
+            setWonPrize(merged.find(p => p.label === savedLabel) || null)
+            setPrizeCode(savedCode)
+          }
+          setPhase(count >= DAILY_SPIN_LIMIT ? 'used' : 'ready')
+          return
         }
-        setPhase(count >= DAILY_SPIN_LIMIT ? 'used' : 'ready')
-        return
+
+        // Usuario real: consulta tabla spins
+        const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
+        const { count } = await supabase
+          .from('spins')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('spun_at', todayStart.toISOString())
+
+        const { data: spinsHoy } = await supabase
+          .from('spins')
+          .select('prize_label, prize_code')
+          .eq('user_id', user.id)
+          .gte('spun_at', todayStart.toISOString())
+          .order('spun_at', { ascending: false })
+          .limit(1)
+
+        const todayCount = count || 0
+        setSpinCount(todayCount)
+
+        const lastSpin = spinsHoy?.[0] || null
+        if (lastSpin && dbPrizes?.length) {
+          const merged = mergePrizes(dbPrizes)
+          setWonPrize(merged.find(p => p.label === lastSpin.prize_label) || null)
+          setPrizeCode(lastSpin.prize_code)
+        }
+
+        setPhase(todayCount >= DAILY_SPIN_LIMIT ? 'used' : 'ready')
+      } catch (e) {
+        setPhase('ready')
       }
-
-      // Usuario real: consulta tabla spins
-      const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
-      const { count } = await supabase
-        .from('spins')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('spun_at', todayStart.toISOString())
-
-      const { data: lastSpin } = await supabase
-        .from('spins')
-        .select('prize_label, prize_code')
-        .eq('user_id', user.id)
-        .gte('spun_at', todayStart.toISOString())
-        .order('spun_at', { ascending: false })
-        .limit(1)
-        .single()
-
-      const todayCount = count || 0
-      setSpinCount(todayCount)
-
-      if (lastSpin && dbPrizes) {
-        const merged = mergePrizes(dbPrizes)
-        setWonPrize(merged.find(p => p.label === lastSpin.prize_label) || null)
-        setPrizeCode(lastSpin.prize_code)
-      }
-
-      setPhase(todayCount >= DAILY_SPIN_LIMIT ? 'used' : 'ready')
     }
 
     loadData()
