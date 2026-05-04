@@ -235,22 +235,26 @@ export default function Ruleta() {
     setTimeout(async () => {
       const code = generateCode()
 
-      if (isDemo(user.id)) {
-        const TODAY = new Date().toDateString()
-        const nextCount = spinCount + 1
-        localStorage.setItem(`spin_date_${user.credential_number}`, TODAY)
-        localStorage.setItem(`spin_count_${user.credential_number}`, String(nextCount))
-        localStorage.setItem(`spin_prize_${user.credential_number}`, winner.label)
-        localStorage.setItem(`spin_code_${user.credential_number}`, code)
-        setSpinCount(nextCount)
-      } else {
-        await supabase.from('spins').insert({
-          user_id: user.id,
-          shopping_id: user.shopping_id,
-          prize_label: winner.label,
-          prize_code: code,
-        })
-        setSpinCount(prev => prev + 1)
+      try {
+        if (isDemo(user.id)) {
+          const TODAY = new Date().toDateString()
+          const nextCount = spinCount + 1
+          localStorage.setItem(`spin_date_${user.credential_number}`, TODAY)
+          localStorage.setItem(`spin_count_${user.credential_number}`, String(nextCount))
+          localStorage.setItem(`spin_prize_${user.credential_number}`, winner.label)
+          localStorage.setItem(`spin_code_${user.credential_number}`, code)
+          setSpinCount(nextCount)
+        } else {
+          await supabase.from('spins').insert({
+            user_id: user.id,
+            shopping_id: user.shopping_id,
+            prize_label: winner.label,
+            prize_code: code,
+          })
+          setSpinCount(prev => prev + 1)
+        }
+      } catch (e) {
+        // El insert falló pero igual mostramos el resultado
       }
 
       setWonPrize(winner)
