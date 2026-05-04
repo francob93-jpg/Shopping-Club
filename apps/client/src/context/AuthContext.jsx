@@ -70,12 +70,20 @@ export function AuthProvider({ children }) {
     }
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(await buildUser(session?.user ?? null))
+      try {
+        setUser(await buildUser(session?.user ?? null))
+      } catch (e) {
+        setUser(null)
+      }
       setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(await buildUser(session?.user ?? null))
+      try {
+        setUser(await buildUser(session?.user ?? null))
+      } catch (e) {
+        setUser(null)
+      }
     })
 
     return () => subscription.unsubscribe()
