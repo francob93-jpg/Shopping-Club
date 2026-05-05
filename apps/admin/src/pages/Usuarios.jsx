@@ -1,59 +1,24 @@
-import { Search, Filter, Award, Mail, Download, Eye, MoreHorizontal } from 'lucide-react'
+import { Search, Filter, Mail, Download, Eye, MoreHorizontal } from 'lucide-react'
 import Avatar from '../components/Avatar'
 
 const USERS_DATA = [
-  { name: 'María Fernández', dni: '34.821.045', cred: 'SL-2024-00142', reg: '12 feb 2024', estado: 'activo', nivel: 'Oro', canjes: 24 },
-  { name: 'Diego Sosa', dni: '28.114.609', cred: 'SL-2024-01893', reg: '08 mar 2024', estado: 'activo', nivel: 'Plata', canjes: 11 },
-  { name: 'Laura Mendoza', dni: '37.502.811', cred: 'SL-2024-00471', reg: '21 feb 2024', estado: 'activo', nivel: 'Oro', canjes: 31 },
-  { name: 'Federico Paz', dni: '31.604.882', cred: 'SL-2024-02104', reg: '14 abr 2024', estado: 'activo', nivel: 'Plata', canjes: 8 },
-  { name: 'Camila Ríos', dni: '40.119.207', cred: 'SL-2024-00908', reg: '02 mar 2024', estado: 'activo', nivel: 'Bronce', canjes: 3 },
-  { name: 'Joaquín Vargas', dni: '29.811.554', cred: 'SL-2024-01024', reg: '18 ene 2024', estado: 'pendiente', nivel: '—', canjes: 0 },
-  { name: 'Sofía Bertelli', dni: '35.227.119', cred: 'SL-2024-00316', reg: '05 feb 2024', estado: 'activo', nivel: 'Oro', canjes: 19 },
-  { name: 'Martín Casas', dni: '27.901.336', cred: 'SL-2023-04812', reg: '22 nov 2023', estado: 'inactivo', nivel: 'Plata', canjes: 47 },
-  { name: 'Valentina Lugo', dni: '42.018.770', cred: 'SL-2024-02211', reg: '19 abr 2024', estado: 'activo', nivel: 'Bronce', canjes: 2 },
-  { name: 'Esteban Aldao', dni: '30.554.901', cred: 'SL-2024-01601', reg: '27 mar 2024', estado: 'activo', nivel: 'Plata', canjes: 6 },
+  { name: 'María Fernández', dni: '34.821.045', cred: 'SL-2024-00142', reg: '12 feb 2024', estado: 'activo', canjes: 24 },
+  { name: 'Diego Sosa', dni: '28.114.609', cred: 'SL-2024-01893', reg: '08 mar 2024', estado: 'activo', canjes: 11 },
+  { name: 'Laura Mendoza', dni: '37.502.811', cred: 'SL-2024-00471', reg: '21 feb 2024', estado: 'activo', canjes: 31 },
+  { name: 'Federico Paz', dni: '31.604.882', cred: 'SL-2024-02104', reg: '14 abr 2024', estado: 'activo', canjes: 8 },
+  { name: 'Camila Ríos', dni: '40.119.207', cred: 'SL-2024-00908', reg: '02 mar 2024', estado: 'activo', canjes: 3 },
+  { name: 'Joaquín Vargas', dni: '29.811.554', cred: 'SL-2024-01024', reg: '18 ene 2024', estado: 'pendiente', canjes: 0 },
+  { name: 'Sofía Bertelli', dni: '35.227.119', cred: 'SL-2024-00316', reg: '05 feb 2024', estado: 'activo', canjes: 19 },
+  { name: 'Martín Casas', dni: '27.901.336', cred: 'SL-2023-04812', reg: '22 nov 2023', estado: 'inactivo', canjes: 47 },
+  { name: 'Valentina Lugo', dni: '42.018.770', cred: 'SL-2024-02211', reg: '19 abr 2024', estado: 'activo', canjes: 2 },
+  { name: 'Esteban Aldao', dni: '30.554.901', cred: 'SL-2024-01601', reg: '27 mar 2024', estado: 'activo', canjes: 6 },
 ]
 
 const MINI_STATS = [
   { lbl: 'Total', val: '2.847', d: '+12.4%', dir: 'up' },
   { lbl: 'Activos', val: '2.501', d: '87.8%', dir: 'flat' },
-  { lbl: 'Nivel Oro', val: '412', d: '+24', dir: 'up' },
   { lbl: 'Nuevos (30d)', val: '312', d: '+8.1%', dir: 'up' },
 ]
-
-function NivelBadge({ nivel }) {
-  if (nivel === 'Oro') {
-    return (
-      <span
-        className="ad-badge gold plain"
-        style={{ background: 'var(--ad-gold-soft)', color: 'var(--ad-gold)' }}
-      >
-        {nivel}
-      </span>
-    )
-  }
-  if (nivel === 'Plata') {
-    return (
-      <span
-        className="ad-badge plain"
-        style={{ background: 'var(--ad-surface-3)', color: 'var(--ad-ink-2)' }}
-      >
-        {nivel}
-      </span>
-    )
-  }
-  if (nivel === 'Bronce') {
-    return (
-      <span
-        className="ad-badge plain"
-        style={{ background: 'rgba(184,134,58,0.06)', color: 'var(--ad-gold)' }}
-      >
-        {nivel}
-      </span>
-    )
-  }
-  return <span style={{ color: 'var(--ad-muted)' }}>{nivel}</span>
-}
 
 export default function Usuarios() {
   return (
@@ -77,7 +42,7 @@ export default function Usuarios() {
       </div>
 
       {/* Mini stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18 }}>
         {MINI_STATS.map((s, i) => (
           <div
             key={i}
@@ -118,11 +83,6 @@ export default function Usuarios() {
           <span>Estado</span>
           <span className="fv">Todos</span>
         </div>
-        <div className="ad-filter">
-          <Award size={14} style={{ color: 'var(--ad-muted)' }} />
-          <span>Nivel</span>
-          <span className="fv">Todos</span>
-        </div>
         <div style={{ flex: 1 }} />
         <span style={{ fontSize: 12.5, color: 'var(--ad-muted)' }}>
           {USERS_DATA.length} de 2.847
@@ -138,7 +98,6 @@ export default function Usuarios() {
               <th>DNI</th>
               <th>Credencial</th>
               <th>Registrado</th>
-              <th>Nivel</th>
               <th style={{ textAlign: 'right' }}>Canjes</th>
               <th>Estado</th>
               <th style={{ width: 60 }} />
@@ -160,9 +119,6 @@ export default function Usuarios() {
                   <span className="mono" style={{ color: 'var(--ad-ink-2)' }}>{u.cred}</span>
                 </td>
                 <td className="cell-muted">{u.reg}</td>
-                <td>
-                  <NivelBadge nivel={u.nivel} />
-                </td>
                 <td style={{ textAlign: 'right' }} className="mono cell-strong">
                   {u.canjes}
                 </td>
