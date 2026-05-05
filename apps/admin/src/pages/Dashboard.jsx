@@ -56,11 +56,11 @@ const TOP_BENEFITS = [
 ]
 
 const RECENT = [
-  { user: 'María Fernández', cred: 'SL-2024-00142', ben: '30% OFF en cafetería', ago: 'hace 4 min' },
-  { user: 'Diego Sosa', cred: 'SL-2024-01893', ben: '2x1 en combos', ago: 'hace 12 min' },
-  { user: 'Laura Mendoza', cred: 'SL-2024-00471', ben: 'Hasta 40% OFF', ago: 'hace 28 min' },
-  { user: 'Federico Paz', cred: 'SL-2024-02104', ben: 'Entrada + combo', ago: 'hace 41 min' },
-  { user: 'Camila Ríos', cred: 'SL-2024-00908', ben: '15% OFF productos', ago: 'hace 1 h' },
+  { user: 'María Fernández', cred: 'PR-2024-00142', ben: '30% OFF en cafetería', ago: 'hace 4 min' },
+  { user: 'Diego Sosa', cred: 'PR-2024-01893', ben: '2x1 en combos', ago: 'hace 12 min' },
+  { user: 'Laura Mendoza', cred: 'PR-2024-00471', ben: 'Hasta 40% OFF', ago: 'hace 28 min' },
+  { user: 'Federico Paz', cred: 'PR-2024-02104', ben: 'Entrada + combo', ago: 'hace 41 min' },
+  { user: 'Camila Ríos', cred: 'PR-2024-00908', ben: '15% OFF productos', ago: 'hace 1 h' },
 ]
 
 const WHEEL_DIST = [

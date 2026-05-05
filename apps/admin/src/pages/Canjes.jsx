@@ -2,18 +2,18 @@ import { Search, Filter, Building2, Tag, Download } from 'lucide-react'
 import Avatar from '../components/Avatar'
 
 const REDEMPTIONS = [
-  { user: 'María Fernández', cred: 'SL-2024-00142', ben: '30% OFF en cafetería', local: 'Café Martínez', cat: 'Gastronomía', fecha: '04 may 2026 · 14:32', estado: 'completado' },
-  { user: 'Diego Sosa', cred: 'SL-2024-01893', ben: '2x1 en combos', local: 'Mostaza', cat: 'Gastronomía', fecha: '04 may 2026 · 14:18', estado: 'completado' },
-  { user: 'Laura Mendoza', cred: 'SL-2024-00471', ben: 'Hasta 40% OFF', local: 'Grimoldi', cat: 'Moda', fecha: '04 may 2026 · 13:54', estado: 'completado' },
-  { user: 'Federico Paz', cred: 'SL-2024-02104', ben: 'Entrada + combo', local: 'Showcase', cat: 'Entretenim.', fecha: '04 may 2026 · 13:21', estado: 'completado' },
-  { user: 'Camila Ríos', cred: 'SL-2024-00908', ben: '15% OFF productos', local: 'Farmacity', cat: 'Salud', fecha: '04 may 2026 · 12:48', estado: 'completado' },
-  { user: 'Sofía Bertelli', cred: 'SL-2024-00316', ben: '30% OFF en cafetería', local: 'Café Martínez', cat: 'Gastronomía', fecha: '04 may 2026 · 12:11', estado: 'completado' },
-  { user: 'Joaquín Vargas', cred: 'SL-2024-01024', ben: '2x1 en combos', local: 'Mostaza', cat: 'Gastronomía', fecha: '04 may 2026 · 11:47', estado: 'cancelado' },
-  { user: 'Esteban Aldao', cred: 'SL-2024-01601', ben: 'Envío gratis +$15.000', local: 'Tienda Hogar', cat: 'Hogar', fecha: '04 may 2026 · 11:32', estado: 'completado' },
-  { user: 'Valentina Lugo', cred: 'SL-2024-02211', ben: 'Tarjeta SUBE +$500', local: 'Servicios', cat: 'Servicios', fecha: '04 may 2026 · 10:58', estado: 'completado' },
-  { user: 'María Fernández', cred: 'SL-2024-00142', ben: '2x1 manicura', local: 'Studio Nails', cat: 'Salud', fecha: '03 may 2026 · 18:14', estado: 'completado' },
-  { user: 'Martín Casas', cred: 'SL-2023-04812', ben: '25% OFF segunda unidad', local: "Levi's", cat: 'Moda', fecha: '03 may 2026 · 17:02', estado: 'completado' },
-  { user: 'Diego Sosa', cred: 'SL-2024-01893', ben: '30% OFF en cafetería', local: 'Café Martínez', cat: 'Gastronomía', fecha: '03 may 2026 · 15:41', estado: 'completado' },
+  { user: 'María Fernández', cred: 'PR-2024-00142', ben: '30% OFF en cafetería', local: 'Café Martínez', cat: 'Gastronomía', fecha: '04 may 2026 · 14:32', estado: 'completado' },
+  { user: 'Diego Sosa', cred: 'PR-2024-01893', ben: '2x1 en combos', local: 'Mostaza', cat: 'Gastronomía', fecha: '04 may 2026 · 14:18', estado: 'completado' },
+  { user: 'Laura Mendoza', cred: 'PR-2024-00471', ben: 'Hasta 40% OFF', local: 'Grimoldi', cat: 'Moda', fecha: '04 may 2026 · 13:54', estado: 'completado' },
+  { user: 'Federico Paz', cred: 'PR-2024-02104', ben: 'Entrada + combo', local: 'Showcase', cat: 'Entretenim.', fecha: '04 may 2026 · 13:21', estado: 'completado' },
+  { user: 'Camila Ríos', cred: 'PR-2024-00908', ben: '15% OFF productos', local: 'Farmacity', cat: 'Salud', fecha: '04 may 2026 · 12:48', estado: 'completado' },
+  { user: 'Sofía Bertelli', cred: 'PR-2024-00316', ben: '30% OFF en cafetería', local: 'Café Martínez', cat: 'Gastronomía', fecha: '04 may 2026 · 12:11', estado: 'completado' },
+  { user: 'Joaquín Vargas', cred: 'PR-2024-01024', ben: '2x1 en combos', local: 'Mostaza', cat: 'Gastronomía', fecha: '04 may 2026 · 11:47', estado: 'cancelado' },
+  { user: 'Esteban Aldao', cred: 'PR-2024-01601', ben: 'Envío gratis +$15.000', local: 'Tienda Hogar', cat: 'Hogar', fecha: '04 may 2026 · 11:32', estado: 'completado' },
+  { user: 'Valentina Lugo', cred: 'PR-2024-02211', ben: 'Tarjeta SUBE +$500', local: 'Servicios', cat: 'Servicios', fecha: '04 may 2026 · 10:58', estado: 'completado' },
+  { user: 'María Fernández', cred: 'PR-2024-00142', ben: '2x1 manicura', local: 'Studio Nails', cat: 'Salud', fecha: '03 may 2026 · 18:14', estado: 'completado' },
+  { user: 'Martín Casas', cred: 'PR-2023-04812', ben: '25% OFF segunda unidad', local: "Levi's", cat: 'Moda', fecha: '03 may 2026 · 17:02', estado: 'completado' },
+  { user: 'Diego Sosa', cred: 'PR-2024-01893', ben: '30% OFF en cafetería', local: 'Café Martínez', cat: 'Gastronomía', fecha: '03 may 2026 · 15:41', estado: 'completado' },
 ]
 
 const MINI_STATS = [

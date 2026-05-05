@@ -2,16 +2,16 @@ import { Search, Filter, Mail, Download, Eye, MoreHorizontal } from 'lucide-reac
 import Avatar from '../components/Avatar'
 
 const USERS_DATA = [
-  { name: 'María Fernández', dni: '34.821.045', cred: 'SL-2024-00142', reg: '12 feb 2024', estado: 'activo', canjes: 24 },
-  { name: 'Diego Sosa', dni: '28.114.609', cred: 'SL-2024-01893', reg: '08 mar 2024', estado: 'activo', canjes: 11 },
-  { name: 'Laura Mendoza', dni: '37.502.811', cred: 'SL-2024-00471', reg: '21 feb 2024', estado: 'activo', canjes: 31 },
-  { name: 'Federico Paz', dni: '31.604.882', cred: 'SL-2024-02104', reg: '14 abr 2024', estado: 'activo', canjes: 8 },
-  { name: 'Camila Ríos', dni: '40.119.207', cred: 'SL-2024-00908', reg: '02 mar 2024', estado: 'activo', canjes: 3 },
-  { name: 'Joaquín Vargas', dni: '29.811.554', cred: 'SL-2024-01024', reg: '18 ene 2024', estado: 'pendiente', canjes: 0 },
-  { name: 'Sofía Bertelli', dni: '35.227.119', cred: 'SL-2024-00316', reg: '05 feb 2024', estado: 'activo', canjes: 19 },
-  { name: 'Martín Casas', dni: '27.901.336', cred: 'SL-2023-04812', reg: '22 nov 2023', estado: 'inactivo', canjes: 47 },
-  { name: 'Valentina Lugo', dni: '42.018.770', cred: 'SL-2024-02211', reg: '19 abr 2024', estado: 'activo', canjes: 2 },
-  { name: 'Esteban Aldao', dni: '30.554.901', cred: 'SL-2024-01601', reg: '27 mar 2024', estado: 'activo', canjes: 6 },
+  { name: 'María Fernández', dni: '34.821.045', cred: 'PR-2024-00142', reg: '12 feb 2024', estado: 'activo', canjes: 24 },
+  { name: 'Diego Sosa', dni: '28.114.609', cred: 'PR-2024-01893', reg: '08 mar 2024', estado: 'activo', canjes: 11 },
+  { name: 'Laura Mendoza', dni: '37.502.811', cred: 'PR-2024-00471', reg: '21 feb 2024', estado: 'activo', canjes: 31 },
+  { name: 'Federico Paz', dni: '31.604.882', cred: 'PR-2024-02104', reg: '14 abr 2024', estado: 'activo', canjes: 8 },
+  { name: 'Camila Ríos', dni: '40.119.207', cred: 'PR-2024-00908', reg: '02 mar 2024', estado: 'activo', canjes: 3 },
+  { name: 'Joaquín Vargas', dni: '29.811.554', cred: 'PR-2024-01024', reg: '18 ene 2024', estado: 'pendiente', canjes: 0 },
+  { name: 'Sofía Bertelli', dni: '35.227.119', cred: 'PR-2024-00316', reg: '05 feb 2024', estado: 'activo', canjes: 19 },
+  { name: 'Martín Casas', dni: '27.901.336', cred: 'PR-2023-04812', reg: '22 nov 2023', estado: 'inactivo', canjes: 47 },
+  { name: 'Valentina Lugo', dni: '42.018.770', cred: 'PR-2024-02211', reg: '19 abr 2024', estado: 'activo', canjes: 2 },
+  { name: 'Esteban Aldao', dni: '30.554.901', cred: 'PR-2024-01601', reg: '27 mar 2024', estado: 'activo', canjes: 6 },
 ]
 
 const MINI_STATS = [
