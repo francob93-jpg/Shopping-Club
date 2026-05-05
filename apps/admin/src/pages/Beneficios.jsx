@@ -58,7 +58,7 @@ function BenefitModal({ onClose }) {
               <input className="ad-input" placeholder="Ej: 30% OFF en cafetería" defaultValue="30% OFF en cafetería" />
             </div>
             <div>
-              <label className="ad-label">Badge</label>
+              <label className="ad-label">Etiqueta</label>
               <input
                 className="ad-input"
                 placeholder="-30%"
