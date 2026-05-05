@@ -94,7 +94,7 @@ export default function Dashboard() {
               {user?.credential_number || 'SL-2024-00142'}
             </div>
             <div style={{ fontSize: 11, opacity: 0.7, marginTop: 3 }}>
-              Socia desde feb 2024 · <span style={{ color: '#e8c97b', fontWeight: 600 }}>Nivel Oro</span>
+              Socia desde feb 2024
             </div>
           </div>
           <div style={{
