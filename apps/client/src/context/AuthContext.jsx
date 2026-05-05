@@ -121,6 +121,7 @@ export function AuthProvider({ children }) {
     const demoUser = DEMO_USERS[normalizedEmail]
 
     if (demoUser && password === '123456') {
+      await supabase.auth.signOut()
       setUser(demoUser)
       localStorage.setItem('club_demo_user', JSON.stringify(demoUser))
       return { success: true, user: demoUser }
