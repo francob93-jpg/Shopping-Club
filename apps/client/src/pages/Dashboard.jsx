@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Bell, ChevronRight, Clock, ShoppingBag, Gauge, Newspaper } from 'lucide-react'
+import { Bell, ChevronRight, Clock } from 'lucide-react'
 
 const CAT_GRADIENT = {
   gastro:    'linear-gradient(135deg, #c8102e 0%, #8e0a1f 100%)',
@@ -161,38 +161,6 @@ export default function Dashboard() {
 
       {/* ── BODY ── */}
       <div style={{ paddingBottom: 16 }}>
-
-        {/* Accesos rápidos */}
-        <div style={{ padding: '16px 20px 0' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-            {[
-              { icon: <ShoppingBag size={22} />, label: 'Beneficios', sub: '24 disponibles', to: '/beneficios' },
-              { icon: <Gauge size={22} />,        label: 'Ruleta',     sub: '10 giros hoy',  to: '/ruleta'     },
-              { icon: <Newspaper size={22} />,    label: 'Novedades',  sub: '3 nuevas',       to: '/novedades'  },
-            ].map((item) => (
-              <div
-                key={item.label}
-                onClick={() => navigate(item.to)}
-                style={{
-                  background: '#fff', borderRadius: 18, padding: 14, cursor: 'pointer',
-                  boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: 8,
-                }}
-              >
-                <div style={{
-                  width: 36, height: 36, borderRadius: 10,
-                  background: 'var(--primary-soft)', color: 'var(--primary)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{item.label}</div>
-                  <div style={{ fontSize: 11, color: 'var(--muted)' }}>{item.sub}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Header sección */}
         <div style={{
