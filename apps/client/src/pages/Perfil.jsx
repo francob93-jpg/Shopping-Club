@@ -97,21 +97,12 @@ export default function Perfil() {
           {/* Logo + badge */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontFamily: 'Fraunces, serif', fontWeight: 700, fontSize: 12 }}>Pr</span>
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: 3 }}>
+                <img src="https://www.paseodelaribera.com.ar/img/logo.png" alt="Paseo de la Ribera" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
               </div>
               <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.8, letterSpacing: '0.04em' }}>
                 Paseo de la Ribera
               </span>
-            </div>
-            <div style={{
-              fontSize: 10, padding: '4px 10px',
-              background: 'rgba(184,134,58,0.22)',
-              border: '1px solid rgba(184,134,58,0.55)',
-              color: '#e8c78a', borderRadius: 999,
-              fontWeight: 700, letterSpacing: '0.08em',
-            }}>
-              NIVEL ORO
             </div>
           </div>
 
@@ -126,7 +117,7 @@ export default function Perfil() {
             <div>
               <div style={{ fontSize: 10, opacity: 0.65, fontWeight: 600, letterSpacing: '0.14em' }}>Nº CREDENCIAL</div>
               <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 16, marginTop: 3, letterSpacing: 1.2 }}>{credencial}</div>
-              <div style={{ fontSize: 11, opacity: 0.6, marginTop: 3 }}>Socia desde feb 2024</div>
+              <div style={{ fontSize: 11, opacity: 0.6, marginTop: 3 }}>Socio desde Abril 2026</div>
             </div>
             <div style={{ width: 52, height: 52, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8e0a1f' }}>
               <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

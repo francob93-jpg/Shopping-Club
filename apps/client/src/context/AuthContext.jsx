@@ -7,14 +7,14 @@ const DEMO_USERS = {
   'empleado@sanluis.com': {
     id: 'demo-employee',
     email: 'empleado@sanluis.com',
-    full_name: 'Maria Gonzalez',
+    full_name: 'Federico Paz',
     dni: '32145678',
     phone: '2664123456',
-    credential_number: 'PR-2024-00142',
+    credential_number: 'PR-2026-00142',
     role: 'employee',
     shopping_id: '35e06fd6-6b8b-4f2e-aae6-648ffa48ff74',
     shopping_name: 'Paseo de la Ribera',
-    avatar_initials: 'MG',
+    avatar_initials: 'FP',
   },
   'admin@sanluis.com': {
     id: 'demo-admin',

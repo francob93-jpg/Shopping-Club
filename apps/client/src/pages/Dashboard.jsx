@@ -47,8 +47,9 @@ export default function Dashboard() {
               width: 32, height: 32, borderRadius: 10,
               background: 'rgba(255,255,255,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden', padding: 4,
             }}>
-              <span style={{ fontFamily: 'Fraunces, serif', fontWeight: 700, fontSize: 14 }}>Pr</span>
+              <img src="https://www.paseodelaribera.com.ar/img/logo.png" alt="Paseo de la Ribera" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
             </div>
             <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.85, letterSpacing: '0.04em' }}>
               Paseo de la Ribera
@@ -94,7 +95,7 @@ export default function Dashboard() {
               {user?.credential_number || 'SL-2024-00142'}
             </div>
             <div style={{ fontSize: 11, opacity: 0.7, marginTop: 3 }}>
-              Socia desde feb 2024
+              Socio desde Abril 2026
             </div>
           </div>
           <div style={{
