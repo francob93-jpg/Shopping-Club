@@ -62,27 +62,29 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    const storedDemoUser = localStorage.getItem('club_demo_user')
-    if (storedDemoUser) {
-      setUser(JSON.parse(storedDemoUser))
-      setLoading(false)
-      return
-    }
-
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      try {
-        setUser(await buildUser(session?.user ?? null))
-      } catch (e) {
-        setUser(null)
+      if (session) {
+        localStorage.removeItem('club_demo_user')
+        try {
+          setUser(await buildUser(session.user))
+        } catch (e) {
+          setUser(null)
+        }
+      } else {
+        const storedDemoUser = localStorage.getItem('club_demo_user')
+        setUser(storedDemoUser ? JSON.parse(storedDemoUser) : null)
       }
       setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      try {
-        setUser(await buildUser(session?.user ?? null))
-      } catch (e) {
-        setUser(null)
+      if (session) {
+        localStorage.removeItem('club_demo_user')
+        try {
+          setUser(await buildUser(session.user))
+        } catch (e) {
+          setUser(null)
+        }
       }
     })
 
