@@ -44,12 +44,12 @@ export default function Dashboard() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: 'rgba(255,255,255,0.2)',
+              height: 28, borderRadius: 6,
+              background: '#fff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              overflow: 'hidden', padding: 4,
+              overflow: 'hidden', padding: '3px 6px',
             }}>
-              <img src="https://www.paseodelaribera.com.ar/img/logo.png" alt="Paseo de la Ribera" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+              <img src="/ribera-logo.png" alt="Paseo de la Ribera" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
             </div>
             <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.85, letterSpacing: '0.04em' }}>
               Paseo de la Ribera
