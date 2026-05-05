@@ -20,7 +20,6 @@ const MINI_STATS = [
   { lbl: 'Hoy', val: '47', sub: '+12 vs ayer' },
   { lbl: 'Esta semana', val: '312', sub: '+8.1%' },
   { lbl: 'Este mes', val: '1.412', sub: '+8.1%' },
-  { lbl: 'Tasa de cancelación', val: '2.4%', sub: '34 cancelados' },
 ]
 
 export default function Canjes() {
@@ -47,7 +46,7 @@ export default function Canjes() {
       </div>
 
       {/* Mini stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18 }}>
         {MINI_STATS.map((s, i) => (
           <div
             key={i}
