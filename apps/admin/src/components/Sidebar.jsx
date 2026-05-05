@@ -12,7 +12,7 @@ import {
 import { useAuth } from '../context/AuthContext'
 
 const NAV_ITEMS = [
-  { to: '/dashboard', label: 'Dashboard', icon: Home },
+  { to: '/dashboard', label: 'Inicio', icon: Home },
   { to: '/beneficios', label: 'Beneficios', icon: Tag, badge: '24' },
   { to: '/ruleta', label: 'Premios de Ruleta', icon: CircleDot },
   { to: '/usuarios', label: 'Usuarios', icon: Users },

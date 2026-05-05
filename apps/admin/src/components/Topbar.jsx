@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom'
 import { Search, Bell, HelpCircle, ChevronRight } from 'lucide-react'
 
 const ROUTE_LABELS = {
-  '/dashboard': 'Dashboard',
+  '/dashboard': 'Inicio',
   '/beneficios': 'Beneficios',
   '/ruleta': 'Premios de Ruleta',
   '/usuarios': 'Usuarios',

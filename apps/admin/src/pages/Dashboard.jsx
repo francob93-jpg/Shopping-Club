@@ -79,7 +79,7 @@ export default function Dashboard() {
       {/* Page head */}
       <div className="ad-page-head">
         <div>
-          <h1>Dashboard</h1>
+          <h1>Inicio</h1>
           <p>Hola Marina · Resumen de actividad del club</p>
         </div>
         <div className="ad-page-actions">
