@@ -140,12 +140,12 @@ export default function Ruleta() {
     const loadData = async () => {
       try {
         // Premios de la ruleta
-        const { data: dbPrizes } = await supabase
+        const { data: dbPrizes, error: prizesError } = await supabase
           .from('prizes')
           .select('*')
           .eq('shopping_id', user.shopping_id)
-          .eq('active', true)
           .order('segment_index')
+        if (prizesError) console.error('Error cargando premios:', prizesError)
 
         if (dbPrizes?.length) setPrizes(mergePrizes(dbPrizes))
 

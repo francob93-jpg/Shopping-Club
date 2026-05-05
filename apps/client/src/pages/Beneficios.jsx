@@ -295,8 +295,8 @@ export default function Beneficios() {
       .from('benefits')
       .select('*')
       .eq('shopping_id', user.shopping_id)
-      .eq('active', true)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) console.error('Error cargando beneficios:', error)
         setBenefits((data || []).map(mapBenefit))
         setLoading(false)
       })
