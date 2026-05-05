@@ -109,7 +109,7 @@ export function AuthProvider({ children }) {
 
     try {
       const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('timeout')), 25000)
+        setTimeout(() => reject(new Error('timeout')), 60000)
       )
       const { data, error } = await Promise.race([
         supabase.auth.signInWithPassword({ email, password }),
