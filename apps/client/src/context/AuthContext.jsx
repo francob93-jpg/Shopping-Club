@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
       .eq('id', authUser.id)
       .single()
     if (!profile) return null
-    return {
+    const u = {
       id: authUser.id,
       email: authUser.email,
       full_name: profile.full_name,
@@ -59,6 +59,8 @@ export function AuthProvider({ children }) {
         .slice(0, 2)
         .toUpperCase(),
     }
+    localStorage.setItem('club_supabase_user', JSON.stringify(u))
+    return u
   }
 
   useEffect(() => {
@@ -73,16 +75,19 @@ export function AuthProvider({ children }) {
         ])
         if (session) {
           localStorage.removeItem('club_demo_user')
+          const cached = localStorage.getItem('club_supabase_user')
+          if (cached) setUser(JSON.parse(cached))
           try {
             const u = await Promise.race([
               buildUser(session.user),
               new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 6000)),
             ])
-            setUser(u)
+            if (u) setUser(u)
           } catch {
-            setUser(null)
+            // mantiene el usuario cacheado si buildUser falla
           }
         } else {
+          localStorage.removeItem('club_supabase_user')
           const storedDemoUser = localStorage.getItem('club_demo_user')
           setUser(storedDemoUser ? JSON.parse(storedDemoUser) : null)
         }
@@ -144,6 +149,7 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut()
     setUser(null)
     localStorage.removeItem('club_demo_user')
+    localStorage.removeItem('club_supabase_user')
   }
 
   return (
