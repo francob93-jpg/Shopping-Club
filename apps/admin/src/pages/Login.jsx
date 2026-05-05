@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Star, Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react'
+import { Eye, EyeOff, ShieldCheck } from 'lucide-react'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -23,60 +23,165 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900 flex flex-col items-center justify-center px-4">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-600/8 rounded-full blur-3xl" />
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'var(--ad-bg)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+      }}
+    >
+      {/* Background glow */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: '30%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 480,
+            height: 480,
+            borderRadius: '50%',
+            background: 'var(--ad-primary-soft)',
+            filter: 'blur(80px)',
+          }}
+        />
       </div>
 
-      <div className="w-full max-w-sm relative z-10">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-dark-800 border border-dark-600 rounded-2xl flex items-center justify-center mx-auto mb-4 relative">
-            <Star className="w-7 h-7 text-brand-500 fill-brand-500" />
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-brand-600 rounded-full flex items-center justify-center">
-              <ShieldCheck className="w-3 h-3 text-white" />
+      <div style={{ width: '100%', maxWidth: 360, position: 'relative', zIndex: 1 }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 14,
+              background: 'var(--ad-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+              position: 'relative',
+              boxShadow: '0 0 0 1px rgba(255,255,255,0.04) inset, 0 8px 24px var(--ad-primary-glow)',
+            }}
+          >
+            <span style={{ color: '#fff', fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em' }}>
+              Pr
+            </span>
+            <div
+              style={{
+                position: 'absolute',
+                bottom: -4,
+                right: -4,
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                background: 'var(--ad-surface)',
+                border: '1px solid var(--ad-line)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ShieldCheck size={13} color="var(--ad-ok)" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-white">Panel de Administración</h1>
-          <p className="text-gray-400 text-sm mt-1">Acceso exclusivo para administradores</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ad-ink)' }}>
+            Panel de Administración
+          </h1>
+          <p style={{ fontSize: 13.5, color: 'var(--ad-muted)', marginTop: 6 }}>
+            Club de Beneficios · Paseo de la Ribera
+          </p>
         </div>
 
-        <div className="bg-dark-700 border border-dark-500 rounded-xl p-3 mb-6 text-xs text-gray-400">
-          <p className="font-medium text-gray-300 mb-1">Demo:</p>
-          <p>Email: <span className="text-brand-400">admin@sanluis.com</span></p>
-          <p>Contraseña: <span className="text-brand-400">123456</span></p>
+        {/* Demo hint */}
+        <div
+          style={{
+            background: 'var(--ad-surface)',
+            border: '1px solid var(--ad-line)',
+            borderRadius: 10,
+            padding: '10px 14px',
+            marginBottom: 20,
+            fontSize: 12,
+            color: 'var(--ad-muted)',
+          }}
+        >
+          <span style={{ fontWeight: 600, color: 'var(--ad-ink-2)' }}>Demo: </span>
+          <span className="mono">admin@ribera.com</span>
+          {' / '}
+          <span className="mono">123456</span>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: 14 }}>
+            <label className="ad-label">Email</label>
             <input
+              className="ad-input"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@shopping.com"
               required
-              className="w-full bg-dark-700 border border-dark-500 text-white placeholder-gray-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 transition-colors"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Contraseña</label>
-            <div className="relative">
+
+          <div style={{ marginBottom: 20 }}>
+            <label className="ad-label">Contraseña</label>
+            <div style={{ position: 'relative' }}>
               <input
+                className="ad-input"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-dark-700 border border-dark-500 text-white placeholder-gray-500 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:border-brand-500 transition-colors"
+                style={{ paddingRight: 42 }}
               />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200">
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--ad-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: 0,
+                }}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">
+            <div
+              style={{
+                background: 'var(--ad-danger-soft)',
+                border: '1px solid var(--ad-danger)',
+                borderRadius: 8,
+                padding: '10px 14px',
+                fontSize: 13,
+                color: 'var(--ad-danger)',
+                marginBottom: 16,
+              }}
+            >
               {error}
             </div>
           )}
@@ -84,9 +189,27 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-brand-600 hover:bg-brand-500 disabled:bg-brand-800 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+            className="ad-btn primary"
+            style={{ width: '100%', padding: '11px 14px', fontSize: 14, opacity: loading ? 0.7 : 1 }}
           >
-            {loading ? <><Loader2 className="w-4 h-4 animate-spin" />Ingresando...</> : 'Ingresar al panel'}
+            {loading ? (
+              <>
+                <div
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: '#fff',
+                    animation: 'spin 0.7s linear infinite',
+                  }}
+                />
+                Ingresando…
+                <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+              </>
+            ) : (
+              'Ingresar al panel'
+            )}
           </button>
         </form>
       </div>

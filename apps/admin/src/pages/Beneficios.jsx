@@ -1,156 +1,401 @@
 import { useState } from 'react'
-import { Plus, Trash2, Edit3, Search, Tag, Image } from 'lucide-react'
+import { Download, Plus, Filter, Building2, Calendar, Edit, MoreHorizontal, X, Check } from 'lucide-react'
 
-const CATEGORIES = ['Gastronomía', 'Indumentaria', 'Entretenimiento', 'Salud', 'Servicios', 'Otro']
-
-const INITIAL_BENEFITS = [
-  { id: 1, local_name: 'Starbucks', title: '20% de descuento en bebidas', description: 'Presentá tu credencial y obtené 20% off en toda la carta.', category: 'Gastronomía', active: true, highlight: true },
-  { id: 2, local_name: 'Zara', title: '15% off en nueva temporada', description: 'Descuento exclusivo para empleados del shopping.', category: 'Indumentaria', active: true, highlight: false },
-  { id: 3, local_name: "McDonald's", title: 'Menú empleado $2.500', description: 'Combo especial con precio diferencial.', category: 'Gastronomía', active: true, highlight: false },
-  { id: 4, local_name: 'Cinemark', title: '2x1 los martes', description: 'Comprá una entrada y llevate la segunda gratis.', category: 'Entretenimiento', active: false, highlight: true },
+const BENEFITS_DATA = [
+  { id: 1, t: '30% OFF en cafetería', local: 'Café Martínez', loc: 'L12', cat: 'Gastronomía', badge: '-30%', vence: '30 abr 2026', dias: 'Lun a Vie', activo: true, canjes: 312 },
+  { id: 2, t: '2x1 en combos', local: 'Mostaza', loc: 'L203', cat: 'Gastronomía', badge: '2x1', vence: '28 abr 2026', dias: 'Todos', activo: true, canjes: 248 },
+  { id: 3, t: 'Hasta 40% OFF', local: 'Grimoldi', loc: 'L08', cat: 'Moda', badge: '-40%', vence: '15 may 2026', dias: 'Todos', activo: true, canjes: 187 },
+  { id: 4, t: 'Entrada + combo', local: 'Showcase', loc: '3er piso', cat: 'Entretenimiento', badge: '-25%', vence: '31 may 2026', dias: 'Miércoles', activo: true, canjes: 142 },
+  { id: 5, t: '15% OFF productos', local: 'Farmacity', loc: 'PB', cat: 'Salud', badge: '-15%', vence: '30 jun 2026', dias: 'Todos', activo: true, canjes: 98 },
+  { id: 6, t: 'Envío gratis +$15.000', local: 'Tienda Hogar', loc: 'L156', cat: 'Hogar', badge: 'Envío', vence: '15 may 2026', dias: 'Todos', activo: true, canjes: 74 },
+  { id: 7, t: "25% OFF segunda unidad", local: "Levi's", loc: 'L24', cat: 'Moda', badge: '-25%', vence: '12 may 2026', dias: 'Todos', activo: false, canjes: 62 },
+  { id: 8, t: 'Tarjeta SUBE +$500', local: 'Servicios', loc: 'PB', cat: 'Servicios', badge: '+$500', vence: '05 may 2026', dias: 'Lun a Vie', activo: true, canjes: 51 },
+  { id: 9, t: '2x1 manicura', local: 'Studio Nails', loc: 'L88', cat: 'Salud', badge: '2x1', vence: '25 abr 2026', dias: 'Mar a Jue', activo: true, canjes: 38 },
+  { id: 10, t: '10% OFF compra total', local: 'Coto', loc: 'Subsuelo', cat: 'Gastronomía', badge: '-10%', vence: '30 abr 2026', dias: 'Todos', activo: false, canjes: 0 },
 ]
 
-export default function Beneficios() {
-  const [benefits, setBenefits] = useState(INITIAL_BENEFITS)
-  const [search, setSearch] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState({ local_name: '', title: '', description: '', category: 'Gastronomía', highlight: false })
+const CATEGORIES = ['Gastronomía', 'Moda', 'Entretenimiento', 'Salud', 'Hogar', 'Servicios', 'Belleza']
+const LOCALES = ['Café Martínez', 'Mostaza', 'Grimoldi', 'Showcase', 'Farmacity', 'Tienda Hogar', "Levi's", 'Studio Nails', 'Coto']
 
-  const filtered = benefits.filter(b =>
-    b.title.toLowerCase().includes(search.toLowerCase()) ||
-    b.local_name.toLowerCase().includes(search.toLowerCase())
-  )
+function BenefitModal({ onClose }) {
+  const [activo, setActivo] = useState(true)
+  const [days, setDays] = useState({ L: true, M: true, X: true, J: true, V: true, S: false, D: false })
+  const [badge, setBadge] = useState('-30%')
 
-  const resetForm = () => {
-    setForm({ local_name: '', title: '', description: '', category: 'Gastronomía', highlight: false })
-    setEditingId(null)
-    setShowForm(false)
+  const dayLabels = [
+    ['L', 'Lun'],
+    ['M', 'Mar'],
+    ['X', 'Mié'],
+    ['J', 'Jue'],
+    ['V', 'Vie'],
+    ['S', 'Sáb'],
+    ['D', 'Dom'],
+  ]
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) onClose()
   }
-
-  const handleEdit = (b) => {
-    setForm({ local_name: b.local_name, title: b.title, description: b.description, category: b.category, highlight: b.highlight })
-    setEditingId(b.id)
-    setShowForm(true)
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (editingId) {
-      setBenefits(benefits.map(b => b.id === editingId ? { ...b, ...form } : b))
-    } else {
-      setBenefits([{ ...form, id: Date.now(), active: true }, ...benefits])
-    }
-    resetForm()
-  }
-
-  const toggleActive = (id) => setBenefits(benefits.map(b => b.id === id ? { ...b, active: !b.active } : b))
-  const deleteBenefit = (id) => setBenefits(benefits.filter(b => b.id !== id))
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Beneficios</h1>
-          <p className="text-gray-400 text-sm mt-1">{benefits.filter(b => b.active).length} activos · {benefits.length} total</p>
+    <div className="ad-modal-back" onClick={handleBackdropClick}>
+      <div className="ad-modal">
+        {/* Head */}
+        <div className="ad-modal-head">
+          <div>
+            <h2>Nuevo beneficio</h2>
+            <div className="sub">Aparecerá en la app de los socios al guardarse</div>
+          </div>
+          <button className="ad-icon-btn" onClick={onClose}>
+            <X size={16} />
+          </button>
         </div>
-        <button
-          onClick={() => { resetForm(); setShowForm(!showForm) }}
-          className="flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">Nuevo beneficio</span>
-          <span className="sm:hidden">Nuevo</span>
+
+        {/* Body */}
+        <div className="ad-modal-body">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: 14 }}>
+            <div>
+              <label className="ad-label">Título</label>
+              <input className="ad-input" placeholder="Ej: 30% OFF en cafetería" defaultValue="30% OFF en cafetería" />
+            </div>
+            <div>
+              <label className="ad-label">Badge</label>
+              <input
+                className="ad-input"
+                placeholder="-30%"
+                value={badge}
+                onChange={(e) => setBadge(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+            <div>
+              <label className="ad-label">Local</label>
+              <select className="ad-select">
+                <option>Seleccionar local…</option>
+                {LOCALES.map((l) => (
+                  <option key={l}>{l}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="ad-label">Categoría</label>
+              <select className="ad-select">
+                <option>Seleccionar categoría…</option>
+                {CATEGORIES.map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 14 }}>
+            <label className="ad-label">Descripción</label>
+            <textarea
+              className="ad-textarea"
+              placeholder="Detalles del beneficio, restricciones, cómo se aplica…"
+              defaultValue="Válido en todas las cafeterías de la sucursal del shopping. No combinable con otras promociones. Aplicable de lunes a viernes."
+            />
+            <div className="ad-help">Visible en la pantalla de detalle del beneficio.</div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+            <div>
+              <label className="ad-label">Fecha de vencimiento</label>
+              <div style={{ position: 'relative' }}>
+                <input className="ad-input" type="text" defaultValue="30/04/2026" style={{ paddingRight: 36 }} />
+                <Calendar
+                  size={14}
+                  style={{
+                    position: 'absolute',
+                    right: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--ad-muted)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="ad-label">Cupo total</label>
+              <input className="ad-input" type="number" placeholder="Ilimitado" />
+              <div className="ad-help">Dejar vacío para ilimitado</div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 14 }}>
+            <label className="ad-label">Días disponibles</label>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {dayLabels.map(([k, l]) => (
+                <button
+                  key={k}
+                  onClick={() => setDays({ ...days, [k]: !days[k] })}
+                  style={{
+                    flex: 1,
+                    padding: '8px 0',
+                    borderRadius: 7,
+                    background: days[k] ? 'var(--ad-primary-soft)' : 'var(--ad-surface-2)',
+                    border: `1px solid ${days[k] ? 'var(--ad-primary)' : 'var(--ad-line)'}`,
+                    color: days[k] ? 'var(--ad-primary)' : 'var(--ad-ink-2)',
+                    fontFamily: 'inherit',
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.12s',
+                  }}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: 14,
+              padding: '12px 14px',
+              background: 'var(--ad-surface-2)',
+              borderRadius: 8,
+              border: '1px solid var(--ad-line)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <button
+              className={`ad-toggle ${activo ? 'on' : ''}`}
+              onClick={() => setActivo(!activo)}
+            />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ad-ink)' }}>
+                Publicar como activo
+              </div>
+              <div style={{ fontSize: 11.5, color: 'var(--ad-muted)', marginTop: 2 }}>
+                Será visible en la app inmediatamente al guardar
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="ad-modal-foot">
+          <button className="ad-btn subtle" onClick={onClose}>
+            Cancelar
+          </button>
+          <button className="ad-btn ghost">Guardar como borrador</button>
+          <button className="ad-btn primary">
+            <Check size={14} />
+            Crear beneficio
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function Beneficios() {
+  const [showModal, setShowModal] = useState(false)
+  const [filter, setFilter] = useState('todos')
+  const [items, setItems] = useState(BENEFITS_DATA)
+
+  const counts = {
+    todos: items.length,
+    activos: items.filter((i) => i.activo).length,
+    pausados: items.filter((i) => !i.activo).length,
+    venciendo: 3,
+  }
+
+  const filtered = items.filter((i) => {
+    if (filter === 'activos') return i.activo
+    if (filter === 'pausados') return !i.activo
+    return true
+  })
+
+  const toggleActive = (id) => {
+    setItems(items.map((i) => (i.id === id ? { ...i, activo: !i.activo } : i)))
+  }
+
+  return (
+    <div className="ad-content">
+      {/* Page head */}
+      <div className="ad-page-head">
+        <div>
+          <h1>Beneficios</h1>
+          <p>Gestioná los beneficios visibles en la app del club</p>
+        </div>
+        <div className="ad-page-actions">
+          <button className="ad-btn ghost">
+            <Download size={14} />
+            Exportar
+          </button>
+          <button className="ad-btn primary" onClick={() => setShowModal(true)}>
+            <Plus size={16} />
+            Nuevo beneficio
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="ad-tabs">
+        <button className={filter === 'todos' ? 'on' : ''} onClick={() => setFilter('todos')}>
+          Todos · {counts.todos}
+        </button>
+        <button className={filter === 'activos' ? 'on' : ''} onClick={() => setFilter('activos')}>
+          Activos · {counts.activos}
+        </button>
+        <button className={filter === 'pausados' ? 'on' : ''} onClick={() => setFilter('pausados')}>
+          Pausados · {counts.pausados}
+        </button>
+        <button className={filter === 'venciendo' ? 'on' : ''} onClick={() => setFilter('venciendo')}>
+          Por vencer · {counts.venciendo}
         </button>
       </div>
 
-      {/* Form */}
-      {showForm && (
-        <div className="bg-dark-800 border border-brand-600/30 rounded-2xl p-5 mb-6">
-          <h3 className="text-white font-semibold mb-4">
-            {editingId ? 'Editar beneficio' : 'Nuevo beneficio'}
-          </h3>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="grid sm:grid-cols-2 gap-3">
-              <input placeholder="Nombre del local *" value={form.local_name} onChange={e => setForm({...form, local_name: e.target.value})} required
-                className="bg-dark-700 border border-dark-500 text-white placeholder-gray-500 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-brand-500" />
-              <select value={form.category} onChange={e => setForm({...form, category: e.target.value})}
-                className="bg-dark-700 border border-dark-500 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-brand-500">
-                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-              </select>
-            </div>
-            <input placeholder="Título del beneficio *" value={form.title} onChange={e => setForm({...form, title: e.target.value})} required
-              className="w-full bg-dark-700 border border-dark-500 text-white placeholder-gray-500 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-brand-500" />
-            <textarea placeholder="Descripción del beneficio..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3}
-              className="w-full bg-dark-700 border border-dark-500 text-white placeholder-gray-500 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-brand-500 resize-none" />
-
-            {/* Image upload placeholder */}
-            <div className="border-2 border-dashed border-dark-500 rounded-xl p-4 text-center text-gray-500 hover:border-dark-400 transition-colors cursor-pointer">
-              <Image className="w-5 h-5 mx-auto mb-1" />
-              <p className="text-xs">Subir foto del local (próximamente)</p>
-            </div>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.highlight} onChange={e => setForm({...form, highlight: e.target.checked})}
-                className="w-4 h-4 accent-brand-600" />
-              <span className="text-gray-300 text-sm">Marcar como destacado</span>
-            </label>
-
-            <div className="flex gap-2 pt-1">
-              <button type="button" onClick={resetForm} className="flex-1 py-2.5 border border-dark-500 text-gray-400 rounded-xl text-sm hover:bg-dark-700 transition-colors">
-                Cancelar
-              </button>
-              <button type="submit" className="flex-1 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-500 transition-colors">
-                {editingId ? 'Guardar cambios' : 'Publicar beneficio'}
-              </button>
-            </div>
-          </form>
+      {/* Filter bar */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 14, alignItems: 'center' }}>
+        <div className="ad-filter">
+          <Filter size={14} style={{ color: 'var(--ad-muted)' }} />
+          <span>Categoría</span>
+          <span className="fv">Todas</span>
         </div>
-      )}
-
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-        <input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)}
-          className="w-full bg-dark-800 border border-dark-600 text-white placeholder-gray-500 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-brand-500" />
+        <div className="ad-filter">
+          <Building2 size={14} style={{ color: 'var(--ad-muted)' }} />
+          <span>Local</span>
+          <span className="fv">Todos</span>
+        </div>
+        <div className="ad-filter">
+          <Calendar size={14} style={{ color: 'var(--ad-muted)' }} />
+          <span>Vencimiento</span>
+          <span className="fv">Cualquiera</span>
+        </div>
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: 12.5, color: 'var(--ad-muted)' }}>
+          {filtered.length} beneficios
+        </span>
       </div>
 
-      {/* List */}
-      <div className="space-y-2">
-        {filtered.map(b => (
-          <div key={b.id} className={`bg-dark-800 border rounded-2xl p-4 transition-colors ${b.active ? 'border-dark-600' : 'border-dark-700 opacity-60'}`}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                  <p className="text-white text-sm font-semibold">{b.title}</p>
-                  {b.highlight && <span className="text-xs bg-brand-600/20 text-brand-400 px-2 py-0.5 rounded-full">Destacado</span>}
-                  {!b.active && <span className="text-xs bg-gray-500/10 text-gray-400 px-2 py-0.5 rounded-full">Inactivo</span>}
-                </div>
-                <p className="text-gray-400 text-xs">{b.local_name} · {b.category}</p>
-                <p className="text-gray-500 text-xs mt-1 line-clamp-1">{b.description}</p>
-              </div>
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <button onClick={() => handleEdit(b)} className="p-1.5 text-gray-500 hover:text-brand-400 transition-colors">
-                  <Edit3 className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => toggleActive(b.id)} className={`p-1.5 transition-colors ${b.active ? 'text-green-400 hover:text-gray-400' : 'text-gray-500 hover:text-green-400'}`}>
-                  <div className={`w-3.5 h-3.5 rounded-full border-2 ${b.active ? 'bg-green-400 border-green-400' : 'border-gray-500'}`} />
-                </button>
-                <button onClick={() => deleteBenefit(b.id)} className="p-1.5 text-gray-500 hover:text-red-400 transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
+      {/* Table */}
+      <div className="ad-card" style={{ padding: 0, overflow: 'hidden' }}>
+        <table className="ad-table">
+          <thead>
+            <tr>
+              <th style={{ width: 36 }}>
+                <input type="checkbox" style={{ accentColor: 'var(--ad-primary)' }} />
+              </th>
+              <th>Beneficio</th>
+              <th>Local</th>
+              <th>Categoría</th>
+              <th>Vencimiento</th>
+              <th style={{ textAlign: 'right' }}>Canjes</th>
+              <th>Estado</th>
+              <th style={{ width: 60 }} />
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((b) => (
+              <tr key={b.id}>
+                <td>
+                  <input type="checkbox" style={{ accentColor: 'var(--ad-primary)' }} />
+                </td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div
+                      style={{
+                        minWidth: 42,
+                        height: 30,
+                        borderRadius: 6,
+                        background: 'var(--ad-primary-soft)',
+                        color: 'var(--ad-primary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        padding: '0 6px',
+                      }}
+                    >
+                      {b.badge}
+                    </div>
+                    <span className="cell-strong">{b.t}</span>
+                  </div>
+                </td>
+                <td>
+                  <div style={{ lineHeight: 1.3 }}>
+                    <div className="cell-strong" style={{ fontSize: 13 }}>
+                      {b.local}
+                    </div>
+                    <div className="cell-muted" style={{ fontSize: 11 }}>
+                      {b.loc}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span className="ad-cat">{b.cat}</span>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Calendar size={14} style={{ color: 'var(--ad-muted)', flexShrink: 0 }} />
+                    <span style={{ color: 'var(--ad-ink-2)' }}>{b.vence}</span>
+                  </div>
+                  <div className="cell-muted" style={{ fontSize: 11, marginTop: 2 }}>
+                    {b.dias}
+                  </div>
+                </td>
+                <td style={{ textAlign: 'right' }}>
+                  <span className="mono cell-strong">{b.canjes}</span>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <button
+                      className={`ad-toggle ${b.activo ? 'on' : ''}`}
+                      onClick={() => toggleActive(b.id)}
+                    />
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: b.activo ? 'var(--ad-ok)' : 'var(--ad-muted)',
+                      }}
+                    >
+                      {b.activo ? 'Activo' : 'Pausado'}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div className="ad-row-actions">
+                    <button className="ad-icon-btn" title="Editar">
+                      <Edit size={14} />
+                    </button>
+                    <button className="ad-icon-btn" title="Más">
+                      <MoreHorizontal size={14} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div
+          style={{
+            padding: '10px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderTop: '1px solid var(--ad-line)',
+            background: 'var(--ad-surface-2)',
+          }}
+        >
+          <span style={{ fontSize: 12, color: 'var(--ad-muted)' }}>
+            Mostrando 1–{filtered.length} de {items.length}
+          </span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button className="ad-btn ghost sm">Anterior</button>
+            <button className="ad-btn ghost sm">Siguiente</button>
           </div>
-        ))}
-
-        {filtered.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            <Tag className="w-10 h-10 mx-auto mb-2 opacity-30" />
-            <p>No hay beneficios cargados</p>
-          </div>
-        )}
+        </div>
       </div>
+
+      {showModal && <BenefitModal onClose={() => setShowModal(false)} />}
     </div>
   )
 }
