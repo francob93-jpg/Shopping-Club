@@ -97,8 +97,8 @@ export default function Perfil() {
           {/* Logo + badge */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ height: 24, borderRadius: 6, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '2px 5px' }}>
-                <img src="/ribera-logo.png" alt="Paseo de la Ribera" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: 'Fraunces, serif', fontWeight: 700, fontSize: 12 }}>Pr</span>
               </div>
               <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.8, letterSpacing: '0.04em' }}>
                 Paseo de la Ribera
