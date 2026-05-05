@@ -62,7 +62,10 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 8000)
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      clearTimeout(timeout)
       if (session) {
         localStorage.removeItem('club_demo_user')
         try {
@@ -74,6 +77,9 @@ export function AuthProvider({ children }) {
         const storedDemoUser = localStorage.getItem('club_demo_user')
         setUser(storedDemoUser ? JSON.parse(storedDemoUser) : null)
       }
+      setLoading(false)
+    }).catch(() => {
+      clearTimeout(timeout)
       setLoading(false)
     })
 
