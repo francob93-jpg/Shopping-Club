@@ -6,10 +6,10 @@ const AuthContext = createContext(null)
 const DEMO_USERS = {
   'empleado@sanluis.com': {
     id: 'demo-employee',
-    email: 'empleado@sanluis.com',
+    email: 'federicopaz@gmail.com',
     full_name: 'Federico Paz',
     dni: '32145678',
-    phone: '2664123456',
+    phone: '03585099032',
     credential_number: 'PR-2026-00142',
     role: 'employee',
     shopping_id: '35e06fd6-6b8b-4f2e-aae6-648ffa48ff74',
