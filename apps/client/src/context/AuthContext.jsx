@@ -147,7 +147,9 @@ export function AuthProvider({ children }) {
   }
 
   const logout = async () => {
-    await supabase.auth.signOut()
+    try {
+      await Promise.race([supabase.auth.signOut(), new Promise(r => setTimeout(r, 2000))])
+    } catch {}
     setUser(null)
     localStorage.removeItem('club_demo_user')
     localStorage.removeItem('club_supabase_user')
