@@ -62,26 +62,40 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 8000)
+    const done = () => setLoading(false)
+    const globalTimeout = setTimeout(done, 8000)
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      clearTimeout(timeout)
-      if (session) {
-        localStorage.removeItem('club_demo_user')
-        try {
-          setUser(await buildUser(session.user))
-        } catch (e) {
-          setUser(null)
+    const init = async () => {
+      try {
+        const { data: { session } } = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 7000)),
+        ])
+        if (session) {
+          localStorage.removeItem('club_demo_user')
+          try {
+            const u = await Promise.race([
+              buildUser(session.user),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 6000)),
+            ])
+            setUser(u)
+          } catch {
+            setUser(null)
+          }
+        } else {
+          const storedDemoUser = localStorage.getItem('club_demo_user')
+          setUser(storedDemoUser ? JSON.parse(storedDemoUser) : null)
         }
-      } else {
+      } catch {
         const storedDemoUser = localStorage.getItem('club_demo_user')
         setUser(storedDemoUser ? JSON.parse(storedDemoUser) : null)
+      } finally {
+        clearTimeout(globalTimeout)
+        done()
       }
-      setLoading(false)
-    }).catch(() => {
-      clearTimeout(timeout)
-      setLoading(false)
-    })
+    }
+
+    init()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
