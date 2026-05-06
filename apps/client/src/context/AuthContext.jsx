@@ -107,8 +107,12 @@ export function AuthProvider({ children }) {
       if (session) {
         localStorage.removeItem('club_demo_user')
         try {
-          setUser(await buildUser(session.user))
-        } catch (e) {
+          const u = await Promise.race([
+            buildUser(session.user),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000)),
+          ])
+          setUser(u)
+        } catch {
           setUser(null)
         }
       }
@@ -122,7 +126,9 @@ export function AuthProvider({ children }) {
     const demoUser = DEMO_USERS[normalizedEmail]
 
     if (demoUser && password === '123456') {
-      Promise.race([supabase.auth.signOut(), new Promise(r => setTimeout(r, 2000))])
+      try {
+        await Promise.race([supabase.auth.signOut(), new Promise(r => setTimeout(r, 2000))])
+      } catch {}
       setUser(demoUser)
       localStorage.setItem('club_demo_user', JSON.stringify(demoUser))
       return { success: true, user: demoUser }
