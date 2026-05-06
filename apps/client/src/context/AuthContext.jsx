@@ -36,11 +36,12 @@ export function AuthProvider({ children }) {
 
   const buildUser = async (authUser) => {
     if (!authUser) return null
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('*, shoppings(name)')
       .eq('id', authUser.id)
       .single()
+    if (error) console.error('[buildUser] error:', error)
     if (!profile) return null
     const u = {
       id: authUser.id,
@@ -136,7 +137,10 @@ export function AuthProvider({ children }) {
         timeout,
       ])
       if (error) return { success: false, error: 'Credenciales incorrectas' }
-      const u = await buildUser(data.user)
+      const u = await Promise.race([
+        buildUser(data.user),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000)),
+      ])
       if (!u) return { success: false, error: 'Perfil no encontrado' }
       setUser(u)
       return { success: true, user: u }
