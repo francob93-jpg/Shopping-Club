@@ -152,7 +152,50 @@ export default function Dashboard() {
                 boxShadow: '0 4px 12px rgba(200,16,46,0.3)',
               }}
             >
-              Ver beneficio
+              Ir a beneficios
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── CARD NOVEDADES ── */}
+      <div style={{ padding: '12px 20px 0' }}>
+        <div style={{ borderRadius: 18, overflow: 'hidden', background: '#fff', boxShadow: '0 8px 24px rgba(26,20,35,0.13)' }}>
+          <div style={{
+            height: 110, position: 'relative',
+            background: 'linear-gradient(160deg, #0f4c81 0%, #1a6cb3 60%, #0a3357 100%)',
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+            padding: 14,
+          }}>
+            <span style={{
+              position: 'absolute', top: 12, left: 12,
+              background: '#fff', color: 'var(--ink)',
+              fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+              padding: '4px 10px', borderRadius: 999,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+            }}>
+              Novedades
+            </span>
+            <div style={{ color: '#fff' }}>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, lineHeight: 1 }}>
+                Enterate de todo
+              </div>
+              <div style={{ fontSize: 11, opacity: 0.8, marginTop: 3 }}>
+                Noticias y eventos del shopping
+              </div>
+            </div>
+          </div>
+          <div style={{ padding: '12px 14px', display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => navigate('/novedades')}
+              style={{
+                background: '#0f4c81', color: '#fff',
+                border: 'none', borderRadius: 10,
+                padding: '8px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(15,76,129,0.3)',
+              }}
+            >
+              Ir a novedades
             </button>
           </div>
         </div>
