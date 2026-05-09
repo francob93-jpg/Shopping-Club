@@ -111,9 +111,10 @@ export function AuthProvider({ children }) {
             buildUser(session.user),
             new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000)),
           ])
-          setUser(u)
+          if (u) setUser(u)
+          // si buildUser devuelve null, mantener el usuario actual (no desloguear)
         } catch {
-          setUser(null)
+          // si hay timeout o error, mantener el usuario actual (no desloguear)
         }
       }
     })
