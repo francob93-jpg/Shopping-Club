@@ -162,7 +162,7 @@ export default function Dashboard() {
       <div style={{ padding: '12px 20px 0' }}>
         <div style={{ borderRadius: 18, overflow: 'hidden', background: '#fff', boxShadow: '0 8px 24px rgba(26,20,35,0.13)' }}>
           <div style={{
-            height: 110, position: 'relative',
+            height: 140, position: 'relative',
             background: 'linear-gradient(160deg, #0f4c81 0%, #1a6cb3 60%, #0a3357 100%)',
             display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
             padding: 14,
