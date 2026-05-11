@@ -10,6 +10,7 @@ import Perfil from './pages/Perfil'
 import MisBeneficios from './pages/MisBeneficios'
 import Verify from './pages/Verify'
 import Verificar from './pages/Verificar'
+import Totem from './pages/Totem'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -34,6 +35,7 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/verify/:credencial" element={<Verify />} />
       <Route path="/verificar" element={<Verificar />} />
+      <Route path="/totem" element={<Totem />} />
       <Route path="/dashboard"    element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/beneficios"   element={<ProtectedRoute><Beneficios /></ProtectedRoute>} />
       <Route path="/novedades"    element={<ProtectedRoute><Novedades /></ProtectedRoute>} />
