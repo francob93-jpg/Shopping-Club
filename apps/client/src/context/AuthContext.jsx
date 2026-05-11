@@ -157,6 +157,17 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const loginWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    })
+    if (error) return { success: false, error: error.message }
+    return { success: true }
+  }
+
   const logout = async () => {
     try {
       await Promise.race([supabase.auth.signOut(), new Promise(r => setTimeout(r, 2000))])
@@ -167,7 +178,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   )
