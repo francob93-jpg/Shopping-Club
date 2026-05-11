@@ -209,24 +209,29 @@ export default function Totem() {
       const TODAY = new Date().toDateString()
 
       try {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id, shopping_id')
           .eq('credential_number', cred)
           .single()
 
-        if (profile) {
-          await supabase.from('spins').insert({
-            user_id: profile.id,
-            shopping_id: profile.shopping_id,
-            prize_label: winner.label,
-            prize_code: code,
-          })
-        } else {
-          throw new Error('no profile')
+        if (profileError) console.error('[Totem] Error buscando perfil:', profileError)
+        if (!profile) throw new Error('no profile')
+
+        const { error: insertError } = await supabase.from('spins').insert({
+          user_id: profile.id,
+          shopping_id: profile.shopping_id,
+          prize_label: winner.label,
+          prize_code: code,
+        })
+
+        if (insertError) {
+          console.error('[Totem] Error insertando spin:', insertError)
+          throw insertError
         }
-      } catch (_) {
-        // Demo fallback: localStorage
+        console.log('[Totem] Spin guardado OK en Supabase')
+      } catch (err) {
+        console.error('[Totem] Fallback a localStorage. Causa:', err)
         localStorage.setItem(`spin_date_${cred}`, TODAY)
         localStorage.setItem(`spin_prize_${cred}`, winner.label)
         if (code) localStorage.setItem(`spin_code_${cred}`, code)
